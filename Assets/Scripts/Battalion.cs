@@ -34,6 +34,11 @@ public class Battalion : MonoBehaviour {
 	}
 
 
+	public Vector3 MovementTarget () {
+		return gameLogic.CurrentEncounterPosition();
+	}
+
+
 	private void Awake () {
 		gameLogic = GetComponent<GameLogic>();
 	}

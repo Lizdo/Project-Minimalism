@@ -27,4 +27,11 @@ public class DebugHelper{
 		Debug.DrawLine(p1, p2, Color.red);
 		Debug.DrawLine(p3, p4, Color.red);
 	}
+
+	public static void Assert(bool condition, string message = "Error!"){
+		if (condition)
+			return;
+		Debug.LogError(message);
+	}
+
 }

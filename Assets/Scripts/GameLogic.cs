@@ -35,6 +35,11 @@ public class GameLogic : MonoBehaviour {
 
 	private void Awake () {
 		battalion = GetComponent<Battalion>();
+		InitializeFirstEncounter();
+	}
+
+	private void InitializeFirstEncounter(){
+		currentEncounter = NextEncounter();
 	}
 
 	private void Start () {
@@ -57,11 +62,8 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private void UpdateCurrentEncounter (){
-		if (!currentEncounter){
-			currentEncounter = NextEncounter();
-		}
-
-		if (currentEncounter && currentEncounter.IsResolved()){
+		DebugHelper.Assert(currentEncounter != null);
+		if (currentEncounter.IsResolved()){
 			round++;
 			previousEncounter = currentEncounter;
 			currentEncounter = NextEncounter();

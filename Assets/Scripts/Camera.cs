@@ -7,11 +7,13 @@ public class Camera : MonoBehaviour {
 	public float cameraHeight = 30;
 
 	private GameObject floor;
+	private GameLogic gameLogic;
 	private Battalion battalion;
 	
 	void Awake (){
 		floor = GameObject.Find("Floor");
-		battalion = gameObject.GetComponent<Battalion>();
+		gameLogic = GetComponent<GameLogic>();
+		battalion = gameLogic.playerBattalion;
 	}
 
 	void Start () {

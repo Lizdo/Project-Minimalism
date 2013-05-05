@@ -12,6 +12,8 @@ public class Unit : MonoBehaviour {
 		Attacking
 	}
 
+	public bool isEnemy;
+
 	public UnitState state = UnitState.Idle;
 	public UnitState previousState;
 	public UnitState nextState = UnitState.Invalid;
@@ -25,22 +27,37 @@ public class Unit : MonoBehaviour {
 	private const int MAX_OFFSET_FROM_BATTALION = 20;
 	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
-	// Core Updates
 
-	private void Awake (){
-		RandomizeOffset();
-		battalion = FindObjectOfType(typeof(Battalion)) as Battalion;
-	}
-
-	private void Start () {
+	// Public interface
+	public void AddToBattalion (Battalion b) {
+		battalion = b;
+		isEnemy = b.isEnemy;
 		Vector3 battalionPositionOnFloor = new Vector3(battalion.transform.position.x,
 			0,
 			battalion.transform.position.z);
 
 		transform.position = battalionPositionOnFloor + offsetFromBattalion;
 		battalion.Add(this);
+		StartCoroutine(FSM());		
+	}
 
-		StartCoroutine(FSM());
+
+	// Core Updates
+
+	private void Awake (){
+		RandomizeOffset();
+		RandomizeRotation();
+	}
+
+	private void RandomizeOffset (){
+		offsetFromBattalion = new Vector3(Random.value * MAX_OFFSET_FROM_BATTALION,
+			0,
+			Random.value * MAX_OFFSET_FROM_BATTALION);
+	}
+
+	private void RandomizeRotation () {
+		float randomRotation = Random.value * 360;
+		transform.rotation = transform.rotation * Quaternion.Euler(0, randomRotation, 0);
 	}
 
 	// Coroutine based State Machine
@@ -105,11 +122,7 @@ public class Unit : MonoBehaviour {
 
 	// Helper Functions
 
-	private void RandomizeOffset (){
-		offsetFromBattalion = new Vector3(Random.value * MAX_OFFSET_FROM_BATTALION,
-			0,
-			Random.value * MAX_OFFSET_FROM_BATTALION);
-	}
+
 
 	private bool IsAtMovementTarget () {
 		Vector3 targetPosition = battalion.MovementTarget();

@@ -14,8 +14,9 @@ public class Battalion : MonoBehaviour {
 	}
 
 	public BattalionState state;
+	public bool isEnemy;
 
-	private List <Unit> units = new List <Unit> ();
+	public List <Unit> units = new List <Unit> ();
 
 	private Bounds lastBound = new Bounds();
 	private Vector3 position;
@@ -39,8 +40,14 @@ public class Battalion : MonoBehaviour {
 	}
 
 
+	public bool AllUnitsDead () {
+		return units.Count == 0;
+	}
+
+	// Updates
+
 	private void Awake () {
-		gameLogic = GetComponent<GameLogic>();
+		gameLogic = FindObjectOfType(typeof(GameLogic)) as GameLogic;
 	}
 
 	private void Start () {

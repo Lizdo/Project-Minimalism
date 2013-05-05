@@ -7,10 +7,14 @@ public class GameLogic : MonoBehaviour {
 
 	public int round;
 
+	public Battalion playerBattalion;
+	public Battalion enemyBattalion;
+
+	public Unit playerUnit;
+	public Unit enemyUnit;
+
 	private Encounter previousEncounter;
 	private Encounter currentEncounter;
-
-	private Battalion battalion;
 
 
 	// Public functions
@@ -19,11 +23,11 @@ public class GameLogic : MonoBehaviour {
 		return currentEncounter.position;
 	}
 
-
 	// Plugs to the UI
 
 	public void AddNewUnit () {
-		Instantiate(Resources.Load("Unit"));
+		Unit u = Instantiate(playerUnit) as Unit;
+		u.AddToBattalion(playerBattalion);
 	}
 
 	public void Reset () {
@@ -34,7 +38,6 @@ public class GameLogic : MonoBehaviour {
 	// Routines
 
 	private void Awake () {
-		battalion = GetComponent<Battalion>();
 		InitializeFirstEncounter();
 	}
 
@@ -50,9 +53,9 @@ public class GameLogic : MonoBehaviour {
 
 	private IEnumerator TestAddNewUnit () {
 		AddNewUnit();
-		yield return new WaitForSeconds(1);
+		yield return new WaitForSeconds(0.3f);
 		AddNewUnit();
-		yield return new WaitForSeconds(1);
+		yield return new WaitForSeconds(0.3f);
 		AddNewUnit();
 	}
 

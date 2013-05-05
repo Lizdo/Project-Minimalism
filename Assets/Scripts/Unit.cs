@@ -17,11 +17,13 @@ public class Unit : MonoBehaviour {
 	public UnitState nextState = UnitState.Invalid;
 
 	public float speed = 30.0f;
+	public float turningSpeed = 5.0f;
 
 	private Battalion battalion;
 	private Vector3 offsetFromBattalion;
 
 	private const int MAX_OFFSET_FROM_BATTALION = 20;
+	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
 	// Core Updates
 
@@ -122,6 +124,12 @@ public class Unit : MonoBehaviour {
 		transform.position = Vector3.MoveTowards(transform.position,
 			targetPosition,
 			Time.deltaTime * speed);
+
+		Quaternion targetRotation = Quaternion.LookRotation(targetPosition - transform.position) * defaultRotation;
+		transform.rotation = Quaternion.Lerp(transform.rotation,
+			targetRotation,
+			Time.deltaTime * turningSpeed);
+
 		return;
 	}
 

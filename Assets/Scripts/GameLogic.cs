@@ -23,16 +23,25 @@ public class GameLogic : MonoBehaviour {
 		return currentEncounter.position;
 	}
 
+	public bool AllEnemiesDead () {
+		return enemyBattalion.AllUnitsDead();
+	}
+
 	// Plugs to the UI
 
-	public void AddNewUnit () {
+	public void AddPlayerUnit () {
 		Unit u = Instantiate(playerUnit) as Unit;
 		u.AddToBattalion(playerBattalion);
 	}
 
+	public void AddEnemyUnit () {
+		Unit u = Instantiate(enemyUnit) as Unit;
+		u.AddToBattalion(enemyBattalion);
+	}
+
 	public void Reset () {
 		round = 0;
-	}	
+	}
 
 
 	// Routines
@@ -47,16 +56,16 @@ public class GameLogic : MonoBehaviour {
 
 	private void Start () {
 		if (DebugHelper.doTests){
-			StartCoroutine(TestAddNewUnit());
+			StartCoroutine(TestAddPlayerUnit());
 		}
 	}
 
-	private IEnumerator TestAddNewUnit () {
-		AddNewUnit();
-		yield return new WaitForSeconds(0.3f);
-		AddNewUnit();
-		yield return new WaitForSeconds(0.3f);
-		AddNewUnit();
+	private IEnumerator TestAddPlayerUnit () {
+		AddPlayerUnit();
+		yield return new WaitForSeconds(0.5f);
+		AddPlayerUnit();
+		yield return new WaitForSeconds(0.5f);
+		AddPlayerUnit();
 	}
 
 	private void Update () {
@@ -80,7 +89,8 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private Vector3 NextEncounterPosition () {
-		return new Vector3(100,0,100);
+		// TODO: Random off-screen location
+		return new Vector3(50,0,50);
 	}
 
 

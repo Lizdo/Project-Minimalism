@@ -9,7 +9,8 @@ public class Unit : MonoBehaviour {
 		Invalid,
 		Idle,
 		Moving,
-		Attacking
+		Attacking,
+		Dead
 	}
 
 	public bool isEnemy;
@@ -20,11 +21,18 @@ public class Unit : MonoBehaviour {
 
 	public float speed = 30.0f;
 	public float turningSpeed = 5.0f;
+	public int size = 1;
+	public float attackingDistance = 10.0f;
+
+	public Unit enemy = null;
+
 
 	private Battalion battalion;
 	private Vector3 offsetFromBattalion;
 
-	private const int MAX_OFFSET_FROM_BATTALION = 20;
+	private const float MAX_OFFSET_FROM_BATTALION = 10.0f;
+	private const float MOVEMENT_TOLERANCE = 5.0f;
+
 	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
 
@@ -41,12 +49,21 @@ public class Unit : MonoBehaviour {
 		StartCoroutine(FSM());		
 	}
 
+	public float DistanceToUnit (Unit u) {
+		Debug.Log(u.enemy);
+		Debug.Log(Vector3.Distance(transform.position, u.transform.position));
+		return Vector3.Distance(transform.position, u.transform.position);
+	}
+
 
 	// Core Updates
 
 	private void Awake (){
 		RandomizeOffset();
 		RandomizeRotation();
+	}
+
+	private void Start () {		
 	}
 
 	private void RandomizeOffset (){
@@ -57,7 +74,7 @@ public class Unit : MonoBehaviour {
 
 	private void RandomizeRotation () {
 		float randomRotation = Random.value * 360;
-		transform.rotation = transform.rotation * Quaternion.Euler(0, randomRotation, 0);
+		transform.rotation = Quaternion.Euler(0, randomRotation, 0) * defaultRotation;
 	}
 
 	// Coroutine based State Machine
@@ -75,11 +92,14 @@ public class Unit : MonoBehaviour {
 		// Execute State
 			if (!IsAtMovementTarget()){
 				nextState = UnitState.Moving;
-			}else if (HasValidTargetInRange()){
+			}
+
+			enemy = battalion.ValidTargetInRange(this);
+			if (enemy){
 				nextState = UnitState.Attacking;
 			}
 
-			yield return new WaitForEndOfFrame();
+			yield return null;
 		}
 
 		yield return StartCoroutine("ExitState");
@@ -93,9 +113,13 @@ public class Unit : MonoBehaviour {
 			if (IsAtMovementTarget()){
 				nextState = UnitState.Idle;
 			}
+
+			if (enemy){
+				nextState = UnitState.Attacking;
+			}
 			
-			MoveToTarget();
-			yield return new WaitForEndOfFrame();
+			MoveToBattalionMovementTarget();
+			yield return null;
 		}
 
 		yield return StartCoroutine("ExitState");
@@ -103,8 +127,37 @@ public class Unit : MonoBehaviour {
 
 
 	IEnumerator Attacking () {
-		yield return null;
+		yield return StartCoroutine("EnterState");
+
+		while (nextState == UnitState.Invalid){
+			// TODO: Play Attack Anim
+			enemy.enemy = this;
+
+			if (!NearEnemy()){
+				MoveToEnemy();
+			}else{
+				AttackEnemy();
+			}
+
+			yield return null;
+		}
+
+		yield return StartCoroutine("ExitState");
 	}
+
+
+	IEnumerator Dead () {
+		yield return StartCoroutine("EnterState");
+
+		while (nextState == UnitState.Invalid){
+			// TODO: Play Dead Anim
+			renderer.material.color = Color.gray;
+			yield return new WaitForEndOfFrame();
+		}
+
+		yield return StartCoroutine("ExitState");
+	}
+
 
 	IEnumerator EnterState () {
 		Debug.Log("Entering State:" + state.ToString(), this);
@@ -122,18 +175,26 @@ public class Unit : MonoBehaviour {
 
 	// Helper Functions
 
-
-
-	private bool IsAtMovementTarget () {
-		Vector3 targetPosition = battalion.MovementTarget();
-		if (Vector3.Distance(transform.position, targetPosition) <= 2.0){
+	private bool NearEnemy() {
+		if (Vector3.Distance(transform.position, enemy.transform.position) < MOVEMENT_TOLERANCE){
 			return true;
 		}
 		return false;
 	}
 
-	private void MoveToTarget () {
+
+	private bool IsAtMovementTarget () {
+		if (isEnemy)
+			return true;
+
 		Vector3 targetPosition = battalion.MovementTarget();
+		if (Vector3.Distance(transform.position, targetPosition) <= MOVEMENT_TOLERANCE){
+			return true;
+		}
+		return false;
+	}
+
+	private void MoveToTarget (Vector3 targetPosition) {
 		transform.position = Vector3.MoveTowards(transform.position,
 			targetPosition,
 			Time.deltaTime * speed);
@@ -146,9 +207,25 @@ public class Unit : MonoBehaviour {
 		return;
 	}
 
-	private bool HasValidTargetInRange () {
-		return false;
+	private void MoveToEnemy () {
+		MoveToTarget(enemy.transform.position);
 	}
+
+	private void MoveToBattalionMovementTarget () {
+		MoveToTarget(battalion.MovementTarget());
+	}
+
+
+	private void AttackEnemy () {
+		if (enemy.size >= size){
+			nextState = UnitState.Dead;
+		}else{
+			nextState = UnitState.Idle;
+			enemy = null;
+		}
+	}
+
+	
 
 	private void Die () {
 		// TODO: Play Death Anim

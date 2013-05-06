@@ -15,16 +15,14 @@ public class Battalion : MonoBehaviour {
 
 	public BattalionState state;
 	public bool isEnemy;
-
 	public List <Unit> units = new List <Unit> ();
 
 	private Bounds lastBound = new Bounds();
-	private Vector3 position;
 	private GameLogic gameLogic;
+	private Battalion enemyBattalion;
 
-	public Vector3 Position(){
-		return position;
-	}
+
+	// Public functions
 
 	public void Add (Unit unit) {
 		units.Add(unit);
@@ -34,9 +32,22 @@ public class Battalion : MonoBehaviour {
 		units.Remove(unit);
 	}
 
+	public Unit ValidTargetInRange (Unit attackingUnit) {
+		foreach (Unit u in enemyBattalion.units){
+			if (u.enemy == null
+				&& attackingUnit.DistanceToUnit(u) <= attackingUnit.attackingDistance){
+				Debug.Log("Found Valid Target", u);
+				return u;
+			}
+		}
+		return null;
+	}
 
 	public Vector3 MovementTarget () {
-		return gameLogic.CurrentEncounterPosition();
+		if (isEnemy)
+			return transform.position;
+		else
+			return gameLogic.CurrentEncounterPosition();
 	}
 
 
@@ -48,22 +59,34 @@ public class Battalion : MonoBehaviour {
 
 	private void Awake () {
 		gameLogic = FindObjectOfType(typeof(GameLogic)) as GameLogic;
+
 	}
 
 	private void Start () {
-	
+		CalculatePosition();
+		if (isEnemy){
+			enemyBattalion = GameObject.Find("PlayerBattalion").GetComponent<Battalion>();
+		}else{
+			enemyBattalion = GameObject.Find("EnemyBattalion").GetComponent<Battalion>();
+		}		
 	}
 	
 	// Update is called once per frame
 	private void Update () {
 		CalculatePosition();
-		DebugHelper.DrawLine(position, gameLogic.CurrentEncounterPosition());
+		DebugHelper.DrawLine(transform.position,
+			gameLogic.CurrentEncounterPosition());
 	}
 
 
 	private void CalculatePosition(){
+		if (isEnemy){
+			transform.position = gameLogic.CurrentEncounterPosition();
+			return;
+		}
+
 		if (units.Count == 0){
-			position = lastBound.center;
+			transform.position = lastBound.center;
 			return;
 		}
 
@@ -75,6 +98,6 @@ public class Battalion : MonoBehaviour {
 		}
 
 		lastBound = b;
-		position = b.center;
+		transform.position = b.center;
 	}
 }

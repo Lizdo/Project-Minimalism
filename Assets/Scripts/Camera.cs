@@ -26,7 +26,7 @@ public class Camera : MonoBehaviour {
 
 
 	private void UpdateCameraPosition() {
-		Vector3 battalionPosition = battalion.Position();
+		Vector3 battalionPosition = battalion.transform.position;
 		transform.position = battalionPosition + new Vector3(0, cameraHeight, 0);
 	}
 }

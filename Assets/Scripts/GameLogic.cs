@@ -20,7 +20,7 @@ public class GameLogic : MonoBehaviour {
 	// Public functions
 
 	public Vector3 CurrentEncounterPosition() {
-		return currentEncounter.position;
+		return currentEncounter.transform.position;
 	}
 
 	public bool AllEnemiesDead () {
@@ -77,20 +77,40 @@ public class GameLogic : MonoBehaviour {
 		DebugHelper.Assert(currentEncounter != null);
 		if (currentEncounter.IsResolved()){
 			round++;
+			Encounter nextEncounter = NextEncounter();
 			previousEncounter = currentEncounter;
-			currentEncounter = NextEncounter();
+			currentEncounter = nextEncounter;
 		}
 	}
 
 	private Encounter NextEncounter () {
 		Encounter e = (Instantiate(Resources.Load("Encounter", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
 		e.SetRoundAndPosition(round, NextEncounterPosition());
+		Debug.Log("New Encounter!");
 		return e;
 	}
 
+	private float distanceBetweenEncounters = 100.0f;
+	private float maxAngleBetweenEncounters = 40.0f;
+
 	private Vector3 NextEncounterPosition () {
-		// TODO: Random off-screen location
-		return new Vector3(50,0,50);
+		Vector3 startingPosition = Vector3.zero;
+
+		if (currentEncounter){
+			startingPosition = currentEncounter.transform.position;
+		}
+
+		float lastAngle = 0;
+		if (currentEncounter && previousEncounter){
+			Vector3 directionBetweenEncounters = currentEncounter.transform.position - previousEncounter.transform.position;
+			lastAngle = Vector3.Angle(directionBetweenEncounters, Vector3.right);
+		}
+
+		float angleToNextEncounter = lastAngle + Random.Range(-1.0f, 1.0f) * maxAngleBetweenEncounters;
+
+		Vector3 offsetToNextEncounter = Quaternion.Euler(0, angleToNextEncounter, 0) * Vector3.right * distanceBetweenEncounters;
+
+		return startingPosition + offsetToNextEncounter;
 	}
 
 

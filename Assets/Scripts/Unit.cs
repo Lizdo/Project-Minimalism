@@ -22,7 +22,7 @@ public class Unit : MonoBehaviour {
 	public float speed = 30.0f;
 	public float turningSpeed = 5.0f;
 	public int size = 1;
-	public float attackingDistance = 10.0f;
+	public float attackingDistance = 30.0f;
 
 	public Unit enemy = null;
 
@@ -50,8 +50,6 @@ public class Unit : MonoBehaviour {
 	}
 
 	public float DistanceToUnit (Unit u) {
-		Debug.Log(u.enemy);
-		Debug.Log(Vector3.Distance(transform.position, u.transform.position));
 		return Vector3.Distance(transform.position, u.transform.position);
 	}
 
@@ -152,6 +150,7 @@ public class Unit : MonoBehaviour {
 		while (nextState == UnitState.Invalid){
 			// TODO: Play Dead Anim
 			renderer.material.color = Color.gray;
+			Die();
 			yield return new WaitForEndOfFrame();
 		}
 
@@ -225,10 +224,7 @@ public class Unit : MonoBehaviour {
 		}
 	}
 
-	
-
 	private void Die () {
-		// TODO: Play Death Anim
 		battalion.Remove(this);
 	}
 

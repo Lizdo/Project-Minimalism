@@ -10,7 +10,6 @@ public class Encounter : MonoBehaviour {
 	}
 
 	public int round;
-	public Vector3 position;
 	private bool isResolved;
 
 	private GameLogic gameLogic;
@@ -20,7 +19,7 @@ public class Encounter : MonoBehaviour {
 
 	public void SetRoundAndPosition (int r, Vector3 p) {
 		round = r;
-		position = p;
+		transform.position = p;
 	}
 
 	public bool IsResolved () {

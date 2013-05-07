@@ -59,16 +59,15 @@ public class Battalion : MonoBehaviour {
 
 	private void Awake () {
 		gameLogic = FindObjectOfType(typeof(GameLogic)) as GameLogic;
-
-	}
-
-	private void Start () {
-		CalculatePosition();
 		if (isEnemy){
 			enemyBattalion = GameObject.Find("PlayerBattalion").GetComponent<Battalion>();
 		}else{
 			enemyBattalion = GameObject.Find("EnemyBattalion").GetComponent<Battalion>();
-		}		
+		}
+		CalculatePosition();
+	}
+
+	private void Start () {
 	}
 	
 	// Update is called once per frame

@@ -128,16 +128,17 @@ public class Unit : MonoBehaviour {
 		yield return StartCoroutine("EnterState");
 
 		while (nextState == UnitState.Invalid){
-			// TODO: Play Attack Anim
 			enemy.enemy = this;
 
-			if (!NearEnemy()){
+			while (!NearEnemy()){
+				Debug.Log("Moving!");
 				MoveToEnemy();
-			}else{
-				AttackEnemy();
+				yield return null;
 			}
 
-			yield return null;
+			// TODO: Play Attack Anim
+			yield return new WaitForSeconds(0.3f);
+			AttackEnemy();
 		}
 
 		yield return StartCoroutine("ExitState");

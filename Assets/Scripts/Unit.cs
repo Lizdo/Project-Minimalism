@@ -152,7 +152,7 @@ public class Unit : MonoBehaviour {
 			// TODO: Play Dead Anim
 			renderer.material.color = Color.gray;
 			Die();
-			yield return new WaitForEndOfFrame();
+			yield return null;
 		}
 
 		yield return StartCoroutine("ExitState");

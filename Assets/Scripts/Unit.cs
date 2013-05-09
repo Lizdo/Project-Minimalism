@@ -36,6 +36,10 @@ public class Unit : MonoBehaviour {
 	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
 
+	private bool useBoid = true;
+
+	public Vector3 boidVelocity = Vector3.zero;
+
 	// Public interface
 	public void AddToBattalion (Battalion b) {
 		battalion = b;
@@ -152,7 +156,8 @@ public class Unit : MonoBehaviour {
 			// TODO: Play Dead Anim
 			renderer.material.color = Color.gray;
 			Die();
-			yield return null;
+			yield return new WaitForSeconds(5.0f);
+			Destroy(gameObject);
 		}
 
 		yield return StartCoroutine("ExitState");
@@ -195,16 +200,45 @@ public class Unit : MonoBehaviour {
 	}
 
 	private void MoveToTarget (Vector3 targetPosition) {
+		RotateTowardsTarget(targetPosition);
+
+		if (useBoid){
+			MoveToTargetUsingBoid(targetPosition);
+			return;
+		}
+
 		transform.position = Vector3.MoveTowards(transform.position,
 			targetPosition,
 			Time.deltaTime * speed);
 
+		return;
+	}
+
+	private void MoveToTargetUsingBoid (Vector3 targetPosition) {
+		Vector3 v1, v2, v3, v4;
+		v1 = battalion.SeparationVelocity(this);
+		v2 = battalion.AlignmentVelocity(this);
+		v3 = battalion.CohesionVelocity(this);
+		v4 = battalion.TendToPlace(this, targetPosition);
+
+		boidVelocity = boidVelocity + v1 + v2 + v3 + v4;
+		limitBoidVelocityToSpeed();
+
+		transform.position += boidVelocity;
+	}
+
+
+	private void RotateTowardsTarget (Vector3 targetPosition){
 		Quaternion targetRotation = Quaternion.LookRotation(targetPosition - transform.position) * defaultRotation;
 		transform.rotation = Quaternion.Lerp(transform.rotation,
 			targetRotation,
 			Time.deltaTime * turningSpeed);
+	}
 
-		return;
+	private void limitBoidVelocityToSpeed () {
+		if (boidVelocity.magnitude >= speed * Time.deltaTime){
+			boidVelocity = boidVelocity.normalized * speed * Time.deltaTime;
+		}
 	}
 
 	private void MoveToEnemy () {

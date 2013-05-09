@@ -99,4 +99,58 @@ public class Battalion : MonoBehaviour {
 		lastBound = b;
 		transform.position = b.center;
 	}
+
+
+	// Boid
+	//	http://www.vergenet.net/~conrad/boids/pseudocode.html
+
+	public Vector3 CohesionVelocity (Unit unit) {
+		if (units.Count <= 1)
+			return Vector3.zero;
+
+		Vector3 center = Vector3.zero;
+		foreach (Unit u in units){
+			if (u != unit){
+				center += u.transform.position;
+			}
+		}
+
+		center = center/(units.Count - 1);
+		return (center - unit.transform.position) / 100;
+	}
+
+	private float distanceBetweenUnits = 3.0f;
+
+	public Vector3 SeparationVelocity (Unit unit) {
+		Vector3 center = Vector3.zero;
+		foreach (Unit u in units){
+			if (u != unit){
+				if (u.DistanceToUnit(unit) < distanceBetweenUnits){
+					center = center - (u.transform.position - unit.transform.position);
+				}
+			}
+		}
+		return center;
+	}
+
+	public Vector3 AlignmentVelocity (Unit unit) {
+		if (units.Count <= 1)
+			return Vector3.zero;
+
+		Vector3 perceivedVelocity = Vector3.zero;
+		foreach (Unit u in units){
+			if (u != unit){
+				perceivedVelocity += u.boidVelocity;
+			}
+		}
+
+		perceivedVelocity /= (units.Count - 1);
+		return (perceivedVelocity - unit.boidVelocity)/8;
+	}
+
+	public Vector3 TendToPlace (Unit unit, Vector3 destination) {
+		return (destination - unit.transform.position) / 100;
+	}
+
+
 }

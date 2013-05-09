@@ -135,7 +135,6 @@ public class Unit : MonoBehaviour {
 			enemy.enemy = this;
 
 			while (!NearEnemy()){
-				Debug.Log("Moving!");
 				MoveToEnemy();
 				yield return null;
 			}

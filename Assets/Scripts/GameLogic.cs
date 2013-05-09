@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GameLogic : MonoBehaviour {
 
@@ -47,6 +48,7 @@ public class GameLogic : MonoBehaviour {
 	// Routines
 
 	private void Awake () {
+		InitEntityPool();
 		InitializeFirstEncounter();
 	}
 
@@ -55,6 +57,7 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private void Start () {
+		SpawnEntitiesAroundNextEncounter();		
 		if (DebugHelper.doTests){
 			StartCoroutine(TestAddPlayerUnit());
 		}
@@ -80,6 +83,7 @@ public class GameLogic : MonoBehaviour {
 			Encounter nextEncounter = NextEncounter();
 			previousEncounter = currentEncounter;
 			currentEncounter = nextEncounter;
+			SpawnEntitiesAroundNextEncounter();
 		}
 	}
 
@@ -113,5 +117,38 @@ public class GameLogic : MonoBehaviour {
 		return startingPosition + offsetToNextEncounter;
 	}
 
+	// Entity Spawner
+
+	private int entityPoolSize = 100;
+	private List <Entity> entityPool = new List <Entity> ();
+
+	private void InitEntityPool () {
+		Entity stone = (Resources.Load("Stone", typeof(GameObject)) as GameObject).GetComponent<Entity>();
+		for (int i = 0; i < entityPoolSize; i++){
+			entityPool.Add(Instantiate(stone) as Entity);
+		}
+	}
+
+	private int amountOfEntityAroundEncounter = 15;
+	private float maxOffsetFromEncounter = 30.0f;
+
+	private void SpawnEntitiesAroundNextEncounter () {
+		Debug.Log("Try to spawn around encounters");
+		for (int i = 0; i < amountOfEntityAroundEncounter; i++){
+			float randomX = Random.Range(-maxOffsetFromEncounter, maxOffsetFromEncounter);
+			float randomZ = Random.Range(-maxOffsetFromEncounter, maxOffsetFromEncounter);
+			Vector3 randomOffset = new Vector3(randomX, 0, randomZ);
+			SpawnAnEntityAt(currentEncounter.transform.position + randomOffset);
+		}
+	}
+
+	private void SpawnAnEntityAt(Vector3 p){
+		foreach (Entity e in entityPool){
+			if (e.canBeUsed){
+				e.UseInPosition(p);
+				return;
+			}
+		}
+	}
 
 }

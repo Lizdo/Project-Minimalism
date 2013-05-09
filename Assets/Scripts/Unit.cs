@@ -221,7 +221,9 @@ public class Unit : MonoBehaviour {
 		v3 = battalion.CohesionVelocity(this);
 		v4 = battalion.TendToPlace(this, targetPosition);
 
-		boidVelocity = boidVelocity + v1 + v2 + v3 + v4;
+		// Reduce the Separation Velocity to reduce the flickering
+		boidVelocity = boidVelocity + v1 * 0.2f + v2 + v3 + v4;
+
 		limitBoidVelocityToSpeed();
 
 		transform.position += boidVelocity;

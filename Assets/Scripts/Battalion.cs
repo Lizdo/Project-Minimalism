@@ -122,15 +122,15 @@ public class Battalion : MonoBehaviour {
 	private float distanceBetweenUnits = 3.0f;
 
 	public Vector3 SeparationVelocity (Unit unit) {
-		Vector3 center = Vector3.zero;
+		Vector3 c = Vector3.zero;
 		foreach (Unit u in units){
 			if (u != unit){
 				if (u.DistanceToUnit(unit) < distanceBetweenUnits){
-					center = center - (u.transform.position - unit.transform.position);
+					c = c - (u.transform.position - unit.transform.position);
 				}
 			}
 		}
-		return center;
+		return c;
 	}
 
 	public Vector3 AlignmentVelocity (Unit unit) {

@@ -223,12 +223,10 @@ public class Unit : MonoBehaviour {
 		v4 = battalion.TendToPlace(this, targetPosition);
 
 		// Reduce the Separation Velocity to reduce the flickering
-		boidVelocity = boidVelocity + v1 * 0.2f + v2 + v3 + v4;
+		boidVelocity = boidVelocity + v1 * 0.7f + v2 + v3 + v4;
 
 		limitBoidVelocityToSpeed();
-
-		boidVelocity = (boidVelocity + lastBoidVelocity) / 2;
-		lastBoidVelocity = boidVelocity;
+		SmoothBoidVelocity();
 
 		transform.position += boidVelocity;
 	}
@@ -245,6 +243,11 @@ public class Unit : MonoBehaviour {
 		if (boidVelocity.magnitude >= speed * Time.deltaTime){
 			boidVelocity = boidVelocity.normalized * speed * Time.deltaTime;
 		}
+	}
+
+	private void SmoothBoidVelocity () {
+		boidVelocity = (boidVelocity + lastBoidVelocity) / 2;
+		lastBoidVelocity = boidVelocity;
 	}
 
 	private void MoveToEnemy () {

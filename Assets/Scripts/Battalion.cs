@@ -17,7 +17,7 @@ public class Battalion : MonoBehaviour {
 	public bool isEnemy;
 	public List <Unit> units = new List <Unit> ();
 
-	private Bounds lastBound = new Bounds();
+	public Bounds bounds = new Bounds();
 	private GameLogic gameLogic;
 	private Battalion enemyBattalion;
 
@@ -85,18 +85,18 @@ public class Battalion : MonoBehaviour {
 		}
 
 		if (units.Count == 0){
-			transform.position = lastBound.center;
+			transform.position = bounds.center;
 			return;
 		}
 
 		Bounds b = new Bounds(units[0].transform.position, 
-			units[0].transform.position);
+			Vector3.zero);
 
 		for (int i = 1; i < units.Count; i++){
 			b.Encapsulate(units[i].transform.position);
 		}
 
-		lastBound = b;
+		bounds = b;
 		transform.position = b.center;
 	}
 

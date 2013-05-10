@@ -4,7 +4,7 @@ using System.Collections;
 public class MainCamera : MonoBehaviour {
 
 
-	public float cameraHeight = 30;
+	public float cameraHeight = 30.0f;
 
 	private GameObject floor;
 	private GameLogic gameLogic;
@@ -23,7 +23,6 @@ public class MainCamera : MonoBehaviour {
 	void Update () {
 		UpdateCameraPosition();
 	}
-
 
 	private void UpdateCameraPosition() {
 		Vector3 battalionPosition = battalion.transform.position;

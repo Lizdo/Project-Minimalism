@@ -40,6 +40,8 @@ public class Unit : MonoBehaviour {
 
 	public Vector3 boidVelocity = Vector3.zero;
 
+	private Vector3 lastBoidVelocity = Vector3.zero;
+
 	// Public interface
 	public void AddToBattalion (Battalion b) {
 		battalion = b;
@@ -224,6 +226,9 @@ public class Unit : MonoBehaviour {
 		boidVelocity = boidVelocity + v1 * 0.2f + v2 + v3 + v4;
 
 		limitBoidVelocityToSpeed();
+
+		boidVelocity = (boidVelocity + lastBoidVelocity) / 2;
+		lastBoidVelocity = boidVelocity;
 
 		transform.position += boidVelocity;
 	}

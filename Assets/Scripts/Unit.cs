@@ -10,6 +10,7 @@ public class Unit : MonoBehaviour {
 		Idle,
 		Moving,
 		Attacking,
+		Mining,
 		Dead
 	}
 
@@ -24,8 +25,8 @@ public class Unit : MonoBehaviour {
 	public int size = 1;
 	public float attackingDistance = 30.0f;
 
-	public Unit enemy = null;
-
+	public Unit enemy;
+	public Mine mine;
 
 	private Battalion battalion;
 	private Vector3 offsetFromBattalion;
@@ -103,6 +104,11 @@ public class Unit : MonoBehaviour {
 				nextState = UnitState.Attacking;
 			}
 
+			mine = battalion.ValidMineInRange(this);
+			if (mine){
+				nextState = UnitState.Mining;
+			}
+
 			yield return null;
 		}
 
@@ -118,8 +124,15 @@ public class Unit : MonoBehaviour {
 				nextState = UnitState.Idle;
 			}
 
+			enemy = battalion.ValidTargetInRange(this);
+
 			if (enemy){
 				nextState = UnitState.Attacking;
+			}
+
+			mine = battalion.ValidMineInRange(this);
+			if (mine){
+				nextState = UnitState.Mining;
 			}
 			
 			MoveToBattalionMovementTarget();
@@ -136,8 +149,8 @@ public class Unit : MonoBehaviour {
 		while (nextState == UnitState.Invalid){
 			enemy.enemy = this;
 
-			while (!NearEnemy()){
-				MoveToEnemy();
+			while (!NearTarget()){
+				MoveToTarget();
 				yield return null;
 			}
 
@@ -148,6 +161,29 @@ public class Unit : MonoBehaviour {
 
 		yield return StartCoroutine("ExitState");
 	}
+
+
+	IEnumerator Mining () {
+		yield return StartCoroutine("EnterState");
+
+		while (nextState == UnitState.Invalid){
+			mine.miner = this;
+
+			while (!NearTarget()){
+				MoveToTarget();
+				yield return null;
+			}
+
+			while (!mine.IsDepleted()){
+				Mine();
+				yield return new WaitForSeconds(1.0f);
+			}
+
+			nextState = UnitState.Idle;
+		}
+
+		yield return StartCoroutine("ExitState");
+	}	
 
 
 	IEnumerator Dead () {
@@ -181,12 +217,26 @@ public class Unit : MonoBehaviour {
 
 	// Helper Functions
 
-	private bool NearEnemy() {
-		if (Vector3.Distance(transform.position, enemy.transform.position) < MOVEMENT_TOLERANCE){
+	private GameObject Target (){
+		if (state == UnitState.Attacking){
+			return enemy.gameObject;
+		}else if (state == UnitState.Mining){
+			return mine.gameObject;
+		}else{
+			return null;
+		}
+	}
+
+	private bool NearTarget(){
+		GameObject target = Target();
+		DebugHelper.Assert(target!=null);
+
+		if (Vector3.Distance(transform.position, target.transform.position) < MOVEMENT_TOLERANCE){
 			return true;
 		}
 		return false;
 	}
+
 
 
 	private bool IsAtMovementTarget () {
@@ -200,7 +250,7 @@ public class Unit : MonoBehaviour {
 		return false;
 	}
 
-	private void MoveToTarget (Vector3 targetPosition) {
+	private void MoveToTargetPosition (Vector3 targetPosition) {
 		RotateTowardsTarget(targetPosition);
 
 		if (useBoid){
@@ -250,12 +300,19 @@ public class Unit : MonoBehaviour {
 		lastBoidVelocity = boidVelocity;
 	}
 
+	private void MoveToTarget() {
+		GameObject target = Target();
+		DebugHelper.Assert(target!=null);
+
+		MoveToTargetPosition(target.transform.position);
+	}
+
 	private void MoveToEnemy () {
-		MoveToTarget(enemy.transform.position);
+		MoveToTargetPosition(enemy.transform.position);
 	}
 
 	private void MoveToBattalionMovementTarget () {
-		MoveToTarget(battalion.MovementTarget());
+		MoveToTargetPosition(battalion.MovementTarget());
 	}
 
 
@@ -266,6 +323,11 @@ public class Unit : MonoBehaviour {
 			nextState = UnitState.Idle;
 			enemy = null;
 		}
+	}
+
+	private void Mine(){
+		// TODO: Play Mine Anim
+		mine.Mined();
 	}
 
 	private void Die () {

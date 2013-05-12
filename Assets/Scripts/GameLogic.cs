@@ -14,8 +14,8 @@ public class GameLogic : MonoBehaviour {
 	public Unit playerUnit;
 	public Unit enemyUnit;
 
-	private Encounter previousEncounter;
-	private Encounter currentEncounter;
+	public Encounter previousEncounter;
+	public Encounter currentEncounter;
 
 	public int score = 200;
 
@@ -30,11 +30,16 @@ public class GameLogic : MonoBehaviour {
 		return enemyBattalion.AllUnitsDead();
 	}
 
+
 	private int scorePerUnit = 100;
 	private int costPerUnit = 50;
 
 	public void EnemyKilled (Unit u) {
 		score += scorePerUnit;
+	}
+
+	public void ResourceMined (int value) {
+		score += value;
 	}
 
 	// Plugs to the UI
@@ -90,6 +95,11 @@ public class GameLogic : MonoBehaviour {
 		DebugHelper.DrawCross(CurrentEncounterPosition());
 	}
 
+
+	///////////////////////////
+	// Encounter Management
+	///////////////////////////
+
 	private void UpdateCurrentEncounter (){
 		DebugHelper.Assert(currentEncounter != null);
 		if (currentEncounter.IsResolved()){
@@ -102,7 +112,16 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private Encounter NextEncounter () {
-		Encounter e = (Instantiate(Resources.Load("EncounterCombat", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
+		float rand = Random.value;
+		Encounter e;
+
+		if (rand >= 0.33){
+			e = (Instantiate(Resources.Load("EncounterCombat", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
+		}else{
+			e = (Instantiate(Resources.Load("EncounterResource", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
+		}
+
+
 		e.SetRoundAndPosition(round, NextEncounterPosition());
 		Debug.Log("New Encounter!");
 		return e;

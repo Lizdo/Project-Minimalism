@@ -41,6 +41,9 @@ public class Battalion : MonoBehaviour {
 	}
 
 	public Unit ValidTargetInRange (Unit attackingUnit) {
+		if (gameLogic.currentEncounter.type != EncounterType.Combat){
+			return null;
+		}
 		foreach (Unit u in enemyBattalion.units){
 			if (u.enemy == null
 				&& attackingUnit.DistanceToUnit(u) <= attackingUnit.attackingDistance){
@@ -49,6 +52,20 @@ public class Battalion : MonoBehaviour {
 			}
 		}
 		return null;
+	}
+
+
+	public Mine ValidMineInRange (Unit idleUnit) {
+		if (gameLogic.currentEncounter.type != EncounterType.Resource){
+			return null;
+		}
+
+		GameObject target = gameLogic.currentEncounter.TargetInRange(idleUnit);
+
+		if (target == null)
+			return null;
+
+		return target.GetComponent<Mine>();
 	}
 
 	public Vector3 MovementTarget () {

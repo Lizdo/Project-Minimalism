@@ -1,13 +1,13 @@
 using UnityEngine;
 using System.Collections;
 
-public class Encounter : MonoBehaviour {
+public enum EncounterType {
+	Combat,
+	Resource,
+	Unit	
+}
 
-	public enum EncounterType {
-		Combat,
-		Resource,
-		Unit	
-	}
+public class Encounter : MonoBehaviour {
 
 	public int round;
 	public EncounterType type;
@@ -25,6 +25,10 @@ public class Encounter : MonoBehaviour {
 
 	public bool IsResolved () {
 		return isResolved;
+	}
+
+	public virtual GameObject TargetInRange (Unit u) {
+		return null;
 	}
 
 

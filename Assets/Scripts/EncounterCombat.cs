@@ -25,4 +25,9 @@ public class EncounterCombat : Encounter {
 			gameLogic.AddEnemyUnit();
 		}
 	}
+
+	public override GameObject TargetInRange (Unit u){
+		// TODO: Refactor this so that we have a reference of the enemy battalion
+		return null;
+	}
 }

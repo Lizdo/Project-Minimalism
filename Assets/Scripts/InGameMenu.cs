@@ -27,9 +27,34 @@ public class InGameMenu : MonoBehaviour {
 	void OnGUI () {
 		GUI.skin = skin;
 
-		if (GUI.Button (new Rect (10,10,80,80), new GUIContent ("Add Unit", icons[iconNames[0]]))){
-			gameLogic.AddPlayerUnit();
+		if (CanAddUnit()){
+			if (GUI.Button (new Rect (10,40,80,80), new GUIContent ("Add Unit\n(Cost 50)", icons[iconNames[0]]))){
+				gameLogic.AddPlayerUnit();
+			}	
+		}else{
+			SetDisabledColor();
+			GUI.Button (new Rect (10,40,80,80), new GUIContent ("Add Unit\n(Cost 50)", icons[iconNames[0]]));
+			RestoreDisabledColor();
+
 		}
+		
+
+		GUI.Label(new Rect (10,10, 100, 80), "$" + gameLogic.score.ToString());
+	}
+
+
+	private void SetDisabledColor () {
+		GUI.color = new Color(0.0f,0.0f,0.0f, 0.2f);
+	}
+
+	private void RestoreDisabledColor () {
+		GUI.color = Color.white;	
+	}
+
+	private int addUnitCost = 50;
+
+	private bool CanAddUnit(){
+		return gameLogic.score >= addUnitCost;
 	}
 
 

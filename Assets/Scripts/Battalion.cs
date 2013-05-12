@@ -29,6 +29,14 @@ public class Battalion : MonoBehaviour {
 	}
 
 	public void Remove (Unit unit){
+		if (!units.Contains(unit)){
+			return;
+		}
+
+		if (isEnemy){
+			gameLogic.EnemyKilled(unit);
+		}
+
 		units.Remove(unit);
 	}
 

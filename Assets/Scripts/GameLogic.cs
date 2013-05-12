@@ -17,6 +17,8 @@ public class GameLogic : MonoBehaviour {
 	private Encounter previousEncounter;
 	private Encounter currentEncounter;
 
+	public int score = 200;
+
 
 	// Public functions
 
@@ -28,9 +30,21 @@ public class GameLogic : MonoBehaviour {
 		return enemyBattalion.AllUnitsDead();
 	}
 
+	private int scorePerUnit = 100;
+	private int costPerUnit = 50;
+
+	public void EnemyKilled (Unit u) {
+		score += scorePerUnit;
+	}
+
 	// Plugs to the UI
 
 	public void AddPlayerUnit () {
+		score -= costPerUnit;
+		AddPlayerUnitWithoutCost();
+	}
+
+	private void AddPlayerUnitWithoutCost () {
 		Unit u = Instantiate(playerUnit) as Unit;
 		u.AddToBattalion(playerBattalion);
 	}
@@ -64,11 +78,11 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private IEnumerator TestAddPlayerUnit () {
-		AddPlayerUnit();
+		AddPlayerUnitWithoutCost();
 		yield return new WaitForSeconds(0.5f);
-		AddPlayerUnit();
+		AddPlayerUnitWithoutCost();
 		yield return new WaitForSeconds(0.5f);
-		AddPlayerUnit();
+		AddPlayerUnitWithoutCost();
 	}
 
 	private void Update () {

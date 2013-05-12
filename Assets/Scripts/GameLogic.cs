@@ -102,7 +102,7 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private Encounter NextEncounter () {
-		Encounter e = (Instantiate(Resources.Load("Encounter", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
+		Encounter e = (Instantiate(Resources.Load("EncounterCombat", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
 		e.SetRoundAndPosition(round, NextEncounterPosition());
 		Debug.Log("New Encounter!");
 		return e;

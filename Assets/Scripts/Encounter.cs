@@ -10,9 +10,10 @@ public class Encounter : MonoBehaviour {
 	}
 
 	public int round;
-	private bool isResolved;
+	public EncounterType type;
+	protected bool isResolved;
 
-	private GameLogic gameLogic;
+	protected GameLogic gameLogic;
 
 
 	// Public functions
@@ -29,27 +30,21 @@ public class Encounter : MonoBehaviour {
 
 	// Core Updates
 
-	private void Awake () {
+	protected virtual void Start () {
+
+	}
+
+	protected virtual void Awake () {
 		gameLogic = FindObjectOfType(typeof(GameLogic)) as GameLogic;
 	}
 
-	private void Start () {
-		SpawnEnemies();
+
+	protected virtual void Update () {
+
 	}
-
-	private void Update () {
-		if (!isResolved)
-			isResolved = gameLogic.AllEnemiesDead();
-	}
-
-
 
 	// Helper functions
 
-	private void SpawnEnemies () {
-		for (int i = 0; i < round+1; i++){
-			gameLogic.AddEnemyUnit();
-		}
-	}
+
 
 }

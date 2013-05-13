@@ -11,10 +11,12 @@ public class Unit : MonoBehaviour {
 		Moving,
 		Attacking,
 		Mining,
-		Dead
+		Dead,
+		PendingAssign
 	}
 
 	public bool isEnemy;
+	public bool isAssigned;	// If the units belongs to a battalion
 
 	public UnitState state = UnitState.Idle;
 	public UnitState previousState;
@@ -24,20 +26,26 @@ public class Unit : MonoBehaviour {
 	public float turningSpeed = 5.0f;
 	public int size = 1;
 	public float attackingDistance = 30.0f;
+	public float joinDistance = 10.0f;
 
 	public Unit enemy;
 	public Mine mine;
 
 	private Battalion battalion;
-	private Vector3 offsetFromBattalion;
+	private Vector3 spawnLocation;
 
-	private const float MAX_OFFSET_FROM_BATTALION = 10.0f;
+	private Vector3 offsetFromSpawnLocation;
+
+	private const float MAX_OFFSET_FROM_SPAWNLOCATION = 10.0f;
 	private const float MOVEMENT_TOLERANCE = 5.0f;
 
 	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
-
 	private bool useBoid = true;
+
+	// Used in boid, check if we really want to reach the target position
+	private bool highPriorityMovementTarget;
+	
 
 	public Vector3 boidVelocity = Vector3.zero;
 
@@ -45,23 +53,35 @@ public class Unit : MonoBehaviour {
 
 	// Public interface
 	public void AddToBattalion (Battalion b) {
-		battalion = b;
-		isEnemy = b.isEnemy;
-		Vector3 battalionPositionOnFloor = new Vector3(battalion.transform.position.x,
+		AssignToBattalion(b);
+		spawnLocation = new Vector3(battalion.transform.position.x,
 			0,
 			battalion.transform.position.z);
-
-		transform.position = battalionPositionOnFloor + offsetFromBattalion;
-		battalion.Add(this);
+		SetInitLocation();
 		StartCoroutine(FSM());		
 	}
+
+	public void AddToEncounter (Encounter e) {
+		isEnemy = false;	// Free unit from encounter
+		GameLogic gameLogic = FindObjectOfType(typeof(GameLogic)) as GameLogic;
+		battalion = gameLogic.playerBattalion;
+		spawnLocation = e.transform.position;
+		SetInitLocation();
+		state = UnitState.PendingAssign;
+		StartCoroutine(FSM());
+	}
+
 
 	public float DistanceToUnit (Unit u) {
 		return Vector3.Distance(transform.position, u.transform.position);
 	}
 
 
-	// Core Updates
+
+	///////////////////////////
+	//  Core Updates
+	///////////////////////////
+		
 
 	private void Awake (){
 		RandomizeOffset();
@@ -71,18 +91,10 @@ public class Unit : MonoBehaviour {
 	private void Start () {		
 	}
 
-	private void RandomizeOffset (){
-		offsetFromBattalion = new Vector3(Random.value * MAX_OFFSET_FROM_BATTALION,
-			0,
-			Random.value * MAX_OFFSET_FROM_BATTALION);
-	}
 
-	private void RandomizeRotation () {
-		float randomRotation = Random.value * 360;
-		transform.rotation = Quaternion.Euler(0, randomRotation, 0) * defaultRotation;
-	}
-
+	///////////////////////////
 	// Coroutine based State Machine
+	///////////////////////////
 
 	IEnumerator FSM () {
 	    // Execute the current coroutine (state)
@@ -145,36 +157,57 @@ public class Unit : MonoBehaviour {
 
 	IEnumerator Attacking () {
 		yield return StartCoroutine("EnterState");
+		timeTryingToMoveToTarget = 0.0f;
 
 		while (nextState == UnitState.Invalid){
 			enemy.enemy = this;
 
-			while (!NearTarget()){
+			while (!NearTarget() && nextState == UnitState.Invalid){
 				MoveToTarget();
+				timeTryingToMoveToTarget += Time.deltaTime;
+				if (!isEnemy && timeTryingToMoveToTarget >= movingToTargetTimeOut){
+					// Only find new targets for friendly units
+					nextState = UnitState.Idle;
+					enemy.enemy = null;
+					enemy = null;
+				}				
 				yield return null;
 			}
 
-			// TODO: Play Attack Anim
-			yield return new WaitForSeconds(0.3f);
-			AttackEnemy();
+			if (enemy){
+				// TODO: Play Attack Anim
+				yield return new WaitForSeconds(0.3f);
+				AttackEnemy();	
+			}
+			
 		}
 
 		yield return StartCoroutine("ExitState");
 	}
 
+	private float timeTryingToMoveToTarget;
+	private float movingToTargetTimeOut = 2.0f;
 
 	IEnumerator Mining () {
 		yield return StartCoroutine("EnterState");
+		timeTryingToMoveToTarget = 0.0f;
 
 		while (nextState == UnitState.Invalid){
 			mine.miner = this;
 
-			while (!NearTarget()){
+			while (!NearTarget() && nextState == UnitState.Invalid){
 				MoveToTarget();
+				timeTryingToMoveToTarget += Time.deltaTime;
+				if (timeTryingToMoveToTarget >= movingToTargetTimeOut){
+					nextState = UnitState.Idle;
+					mine.miner = null;
+					mine = null;
+				}
+
 				yield return null;
 			}
 
-			while (!mine.IsDepleted()){
+			while (mine && !mine.IsDepleted()){
 				Mine();
 				yield return new WaitForSeconds(1.0f);
 			}
@@ -200,6 +233,21 @@ public class Unit : MonoBehaviour {
 		yield return StartCoroutine("ExitState");
 	}
 
+	IEnumerator PendingAssign () {
+		yield return StartCoroutine("EnterState");
+
+		while (nextState == UnitState.Invalid){
+			// TODO: Play Dead Anim
+			if (battalion.HasValidFriendlyInRange(this)){
+				AssignToBattalion(battalion);
+				nextState = UnitState.Idle;
+			}
+			yield return null;
+		}
+
+		yield return StartCoroutine("ExitState");
+	}
+
 
 	IEnumerator EnterState () {
 		Debug.Log("Entering State:" + state.ToString(), this);
@@ -215,7 +263,25 @@ public class Unit : MonoBehaviour {
 	}
 
 
+	///////////////////////////
 	// Helper Functions
+	///////////////////////////
+
+	private void RandomizeOffset (){
+		offsetFromSpawnLocation = new Vector3(Random.value * MAX_OFFSET_FROM_SPAWNLOCATION,
+			0,
+			Random.value * MAX_OFFSET_FROM_SPAWNLOCATION);
+	}
+
+	private void RandomizeRotation () {
+		float randomRotation = Random.value * 360;
+		transform.rotation = Quaternion.Euler(0, randomRotation, 0) * defaultRotation;
+	}
+
+	private void SetInitLocation () {
+		transform.position = spawnLocation + offsetFromSpawnLocation;
+	}
+
 
 	private GameObject Target (){
 		if (state == UnitState.Attacking){
@@ -237,7 +303,12 @@ public class Unit : MonoBehaviour {
 		return false;
 	}
 
-
+	private void AssignToBattalion (Battalion b) {
+		isEnemy = b.isEnemy;
+		battalion = b;
+		isAssigned = true;
+		battalion.Add(this);
+	}
 
 	private bool IsAtMovementTarget () {
 		if (isEnemy)
@@ -266,14 +337,16 @@ public class Unit : MonoBehaviour {
 	}
 
 	private void MoveToTargetUsingBoid (Vector3 targetPosition) {
+		float tendToPlaceMultiplier = highPriorityMovementTarget ? 5.0f : 0.8f;
+
 		Vector3 v1, v2, v3, v4;
-		v1 = battalion.SeparationVelocity(this);
+		v1 = battalion.SeparationVelocity(this) * 0.7f; // Allow some separation.
 		v2 = battalion.AlignmentVelocity(this);
-		v3 = battalion.CohesionVelocity(this);
-		v4 = battalion.TendToPlace(this, targetPosition);
+		v3 = battalion.CohesionVelocity(this) * 2.0f;
+		v4 = battalion.TendToPlace(this, targetPosition) * tendToPlaceMultiplier;
 
 		// Reduce the Separation Velocity to reduce the flickering
-		boidVelocity = boidVelocity + v1 * 0.7f + v2 + v3 + v4;
+		boidVelocity = boidVelocity + v1 + v2 + v3 + v4;
 
 		limitBoidVelocityToSpeed();
 		SmoothBoidVelocity();
@@ -304,14 +377,17 @@ public class Unit : MonoBehaviour {
 		GameObject target = Target();
 		DebugHelper.Assert(target!=null);
 
+		highPriorityMovementTarget = true;
 		MoveToTargetPosition(target.transform.position);
 	}
 
 	private void MoveToEnemy () {
+		highPriorityMovementTarget = true;
 		MoveToTargetPosition(enemy.transform.position);
 	}
 
 	private void MoveToBattalionMovementTarget () {
+		highPriorityMovementTarget = false;
 		MoveToTargetPosition(battalion.MovementTarget());
 	}
 

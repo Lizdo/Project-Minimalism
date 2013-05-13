@@ -30,7 +30,6 @@ public class GameLogic : MonoBehaviour {
 		return enemyBattalion.AllUnitsDead();
 	}
 
-
 	private int scorePerUnit = 100;
 	private int costPerUnit = 50;
 
@@ -115,8 +114,10 @@ public class GameLogic : MonoBehaviour {
 		float rand = Random.value;
 		Encounter e;
 
-		if (rand >= 0.33){
+		if (rand >= 0.4){
 			e = (Instantiate(Resources.Load("EncounterCombat", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
+		}else if (rand >= 0.3){
+			e = (Instantiate(Resources.Load("EncounterUnit", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
 		}else{
 			e = (Instantiate(Resources.Load("EncounterResource", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
 		}

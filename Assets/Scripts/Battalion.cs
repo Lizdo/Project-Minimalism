@@ -40,6 +40,16 @@ public class Battalion : MonoBehaviour {
 		units.Remove(unit);
 	}
 
+	public bool HasValidFriendlyInRange (Unit unassignedUnit){
+		foreach (Unit u in units){
+			if (unassignedUnit.DistanceToUnit(u) <= unassignedUnit.joinDistance){
+				Debug.Log("Found Valid Target", u);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public Unit ValidTargetInRange (Unit attackingUnit) {
 		if (gameLogic.currentEncounter.type != EncounterType.Combat){
 			return null;

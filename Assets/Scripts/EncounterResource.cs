@@ -27,7 +27,7 @@ public class EncounterResource : Encounter {
 
 
 	private void SpawnMines () {
-		for (int i = 0; i < round; i++){
+		for (int i = 0; i < round/2; i++){
 			Mine m = Instantiate(mine) as Mine;
 			mines.Add(m);
 			m.SetEncounter(this);

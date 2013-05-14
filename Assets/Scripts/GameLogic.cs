@@ -70,7 +70,7 @@ public class GameLogic : MonoBehaviour {
 		InitializeFirstEncounter();
 	}
 
-	private void InitializeFirstEncounter(){
+	private void InitializeFirstEncounter() {
 		currentEncounter = NextEncounter();
 	}
 
@@ -99,7 +99,7 @@ public class GameLogic : MonoBehaviour {
 	// Encounter Management
 	///////////////////////////
 
-	private void UpdateCurrentEncounter (){
+	private void UpdateCurrentEncounter () {
 		DebugHelper.Assert(currentEncounter != null);
 		if (currentEncounter.IsResolved()){
 			round++;

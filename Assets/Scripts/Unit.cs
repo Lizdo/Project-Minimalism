@@ -83,7 +83,7 @@ public class Unit : MonoBehaviour {
 	///////////////////////////
 		
 
-	private void Awake (){
+	private void Awake () {
 		RandomizeOffset();
 		RandomizeRotation();
 	}
@@ -162,14 +162,15 @@ public class Unit : MonoBehaviour {
 		while (nextState == UnitState.Invalid){
 			enemy.enemy = this;
 
-			while (!NearTarget() && nextState == UnitState.Invalid){
+			while (!NearTarget()){
 				MoveToTarget();
 				timeTryingToMoveToTarget += Time.deltaTime;
 				if (!isEnemy && timeTryingToMoveToTarget >= movingToTargetTimeOut){
 					// Only find new targets for friendly units
-					nextState = UnitState.Idle;
 					enemy.enemy = null;
 					enemy = null;
+					nextState = UnitState.Idle;
+					break;
 				}				
 				yield return null;
 			}
@@ -195,13 +196,14 @@ public class Unit : MonoBehaviour {
 		while (nextState == UnitState.Invalid){
 			mine.miner = this;
 
-			while (!NearTarget() && nextState == UnitState.Invalid){
+			while (!NearTarget()){
 				MoveToTarget();
 				timeTryingToMoveToTarget += Time.deltaTime;
 				if (timeTryingToMoveToTarget >= movingToTargetTimeOut){
-					nextState = UnitState.Idle;
 					mine.miner = null;
 					mine = null;
+					nextState = UnitState.Idle;
+					break;
 				}
 
 				yield return null;
@@ -267,7 +269,7 @@ public class Unit : MonoBehaviour {
 	// Helper Functions
 	///////////////////////////
 
-	private void RandomizeOffset (){
+	private void RandomizeOffset () {
 		offsetFromSpawnLocation = new Vector3(Random.value * MAX_OFFSET_FROM_SPAWNLOCATION,
 			0,
 			Random.value * MAX_OFFSET_FROM_SPAWNLOCATION);
@@ -283,7 +285,7 @@ public class Unit : MonoBehaviour {
 	}
 
 
-	private GameObject Target (){
+	private GameObject Target () {
 		if (state == UnitState.Attacking){
 			return enemy.gameObject;
 		}else if (state == UnitState.Mining){
@@ -293,7 +295,7 @@ public class Unit : MonoBehaviour {
 		}
 	}
 
-	private bool NearTarget(){
+	private bool NearTarget () {
 		GameObject target = Target();
 		DebugHelper.Assert(target!=null);
 
@@ -337,7 +339,7 @@ public class Unit : MonoBehaviour {
 	}
 
 	private void MoveToTargetUsingBoid (Vector3 targetPosition) {
-		float tendToPlaceMultiplier = highPriorityMovementTarget ? 5.0f : 0.8f;
+		float tendToPlaceMultiplier = highPriorityMovementTarget ? 2.0f : 0.8f;
 
 		Vector3 v1, v2, v3, v4;
 		v1 = battalion.SeparationVelocity(this) * 0.7f; // Allow some separation.
@@ -401,7 +403,7 @@ public class Unit : MonoBehaviour {
 		}
 	}
 
-	private void Mine(){
+	private void Mine() {
 		// TODO: Play Mine Anim
 		mine.Mined();
 	}

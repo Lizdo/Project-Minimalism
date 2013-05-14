@@ -13,7 +13,7 @@ public class Mine : MonoBehaviour {
 	private EncounterResource encounter;
 	private GameLogic gameLogic;
 
-	private void Awake (){
+	private void Awake () {
 		gameLogic = FindObjectOfType(typeof(GameLogic)) as GameLogic;
 	}
 
@@ -53,7 +53,7 @@ public class Mine : MonoBehaviour {
 
 	private int mineSpeedPerSec = 100;
 
-	public void Mined(){
+	public void Mined() {
 		resource -= mineSpeedPerSec;
 		gameLogic.ResourceMined(mineSpeedPerSec);
 		if (IsDepleted()){
@@ -61,11 +61,11 @@ public class Mine : MonoBehaviour {
 		}
 	}
 
-	private void Deplete(){
+	private void Deplete() {
 		renderer.material.color = Color.gray;
 	}
 
-	private void RandomizeOffset (){
+	private void RandomizeOffset () {
 		offsetFromEncounter = new Vector3(Random.value * MAX_OFFSET_FROM_ENCOUNTER,
 			0,
 			Random.value * MAX_OFFSET_FROM_ENCOUNTER);

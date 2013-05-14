@@ -113,7 +113,7 @@ public class Battalion : MonoBehaviour {
 	}
 
 
-	private void CalculatePosition(){
+	private void CalculatePosition() {
 		if (isEnemy){
 			transform.position = gameLogic.CurrentEncounterPosition();
 			return;

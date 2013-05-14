@@ -13,7 +13,7 @@ public class MainCamera : MonoBehaviour {
 	private GameLogic gameLogic;
 	private Battalion battalion;
 	
-	void Awake (){
+	void Awake () {
 		floor = GameObject.Find("Floor");
 		gameLogic = GetComponent<GameLogic>();
 		battalion = gameLogic.playerBattalion;

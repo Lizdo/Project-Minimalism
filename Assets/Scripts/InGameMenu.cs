@@ -68,7 +68,7 @@ public class InGameMenu : MonoBehaviour {
 
 	private int addUnitCost = 50;
 
-	private bool CanAddUnit(){
+	private bool CanAddUnit() {
 		return gameLogic.score >= addUnitCost;
 	}
 
@@ -79,7 +79,7 @@ public class InGameMenu : MonoBehaviour {
 
 	private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
 
-	private void LoadIcons(){
+	private void LoadIcons() {
 		icons.Add(iconNames[0], Resources.Load(iconNames[0], typeof(Texture2D)) as Texture2D);
 	}
 }

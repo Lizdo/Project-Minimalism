@@ -25,7 +25,7 @@ public class EncounterUnit : Encounter {
 
 
 	private void SpawnUnits () {
-		for (int i = 0; i < round; i++){
+		for (int i = 0; i < round/3 + 1; i++){
 			Unit u = Instantiate(playerUnit) as Unit;
 			u.AddToEncounter(this);
 			units.Add(u);

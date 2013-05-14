@@ -28,6 +28,17 @@ public class Unit : MonoBehaviour {
 	public float attackingDistance = 30.0f;
 	public float joinDistance = 10.0f;
 
+	public float maxHealth = 100;
+	public float health;
+
+	public bool isDead;
+
+	public float attackDamage = 60;
+
+	// TODO: plug logic to calculate attack damage from upgrade level
+	public int healthUpgradeLevel = 1;
+	public int attackDamageUpgradeLevel = 1;
+
 	public Unit enemy;
 	public Mine mine;
 
@@ -41,15 +52,16 @@ public class Unit : MonoBehaviour {
 
 	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
+
+
 	private bool useBoid = true;
 
 	// Used in boid, check if we really want to reach the target position
 	private bool highPriorityMovementTarget;
-	
-
 	public Vector3 boidVelocity = Vector3.zero;
-
 	private Vector3 lastBoidVelocity = Vector3.zero;
+
+	private Color initialColor;
 
 	// Public interface
 	public void AddToBattalion (Battalion b) {
@@ -77,6 +89,16 @@ public class Unit : MonoBehaviour {
 	}
 
 
+	public void TakeDamage (float amount, Unit source) {
+		Debug.Log("Damaging!", source);
+		health -= amount;
+		if (health <= 0){
+			health = 0;
+			Die();
+		}
+		UpdateHealthVisual();
+	}
+
 
 	///////////////////////////
 	//  Core Updates
@@ -86,6 +108,8 @@ public class Unit : MonoBehaviour {
 	private void Awake () {
 		RandomizeOffset();
 		RandomizeRotation();
+		health = maxHealth;
+		initialColor = renderer.sharedMaterial.color;
 	}
 
 	private void Start () {		
@@ -111,11 +135,7 @@ public class Unit : MonoBehaviour {
 				nextState = UnitState.Moving;
 			}
 
-			enemy = battalion.ValidTargetInRange(this);
-			if (enemy){
-				nextState = UnitState.Attacking;
-			}
-
+			AssignEnemy();
 			mine = battalion.ValidMineInRange(this);
 			if (mine){
 				nextState = UnitState.Mining;
@@ -136,11 +156,7 @@ public class Unit : MonoBehaviour {
 				nextState = UnitState.Idle;
 			}
 
-			enemy = battalion.ValidTargetInRange(this);
-
-			if (enemy){
-				nextState = UnitState.Attacking;
-			}
+			AssignEnemy();
 
 			mine = battalion.ValidMineInRange(this);
 			if (mine){
@@ -160,7 +176,6 @@ public class Unit : MonoBehaviour {
 		timeTryingToMoveToTarget = 0.0f;
 
 		while (nextState == UnitState.Invalid){
-			enemy.enemy = this;
 
 			while (!NearTarget()){
 				MoveToTarget();
@@ -175,11 +190,22 @@ public class Unit : MonoBehaviour {
 				yield return null;
 			}
 
-			if (enemy){
+			if (enemy && !enemy.isDead){
 				// TODO: Play Attack Anim
 				yield return new WaitForSeconds(0.3f);
-				AttackEnemy();	
+				AttackEnemy();
 			}
+
+			if (!enemy || enemy.isDead){
+				enemy = null;
+				nextState = UnitState.Idle;
+			}
+
+			if (isDead){
+				nextState = UnitState.Dead;
+			}
+
+			yield return null;
 			
 		}
 
@@ -223,16 +249,9 @@ public class Unit : MonoBehaviour {
 
 	IEnumerator Dead () {
 		yield return StartCoroutine("EnterState");
-
-		while (nextState == UnitState.Invalid){
-			// TODO: Play Dead Anim
-			renderer.material.color = Color.gray;
-			Die();
-			yield return new WaitForSeconds(5.0f);
-			Destroy(gameObject);
+		while (true){
+			yield return new WaitForSeconds(1.0f);
 		}
-
-		yield return StartCoroutine("ExitState");
 	}
 
 	IEnumerator PendingAssign () {
@@ -393,13 +412,22 @@ public class Unit : MonoBehaviour {
 		MoveToTargetPosition(battalion.MovementTarget());
 	}
 
-
 	private void AttackEnemy () {
-		if (enemy.size >= size){
-			nextState = UnitState.Dead;
-		}else{
+		enemy.TakeDamage(attackDamage, this);
+		if (enemy.isDead && !isDead){
 			nextState = UnitState.Idle;
 			enemy = null;
+		}
+	}
+
+	private void AssignEnemy () {
+		if (!enemy){
+			enemy = battalion.ValidTargetInRange(this);
+		}			
+
+		if (enemy){
+			enemy.enemy = this;
+			nextState = UnitState.Attacking;
 		}
 	}
 
@@ -408,8 +436,27 @@ public class Unit : MonoBehaviour {
 		mine.Mined();
 	}
 
+	private void UpdateHealthVisual () {
+		renderer.material.color = Color.Lerp(initialColor, Color.white, 1-health/maxHealth);
+	}
+	
+
 	private void Die () {
+		if (isDead){
+			Debug.Log("Already Dead.....", this);
+			return;
+		}
+
+		Debug.Log("Unit Dead.....", this);
+		isDead = true;
+		nextState = UnitState.Dead;
 		battalion.Remove(this);
+		StartCoroutine("DestroyGO");
+	}
+
+	IEnumerator DestroyGO (){
+		yield return new WaitForSeconds(3.0f);
+		Destroy(gameObject);
 	}
 
 }

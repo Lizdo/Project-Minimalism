@@ -56,7 +56,7 @@ public class Battalion : MonoBehaviour {
 		}
 		foreach (Unit u in enemyBattalion.units){
 			if (u.enemy == null
-				&& attackingUnit.DistanceToUnit(u) <= attackingUnit.attackingDistance){
+				&& attackingUnit.DistanceToUnit(u) <= attackingUnit.attackDistance){
 				Debug.Log("Found Valid Target", u);
 				return u;
 			}

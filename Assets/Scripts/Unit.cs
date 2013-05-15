@@ -25,15 +25,17 @@ public class Unit : MonoBehaviour {
 	public float speed = 30.0f;
 	public float turningSpeed = 5.0f;
 	public int size = 1;
-	public float attackingDistance = 30.0f;
-	public float joinDistance = 10.0f;
 
+	public float attackDistance = 30.0f;
+	public float attackSpeed = 0.1f;	// Time Per Attack
+	public float attackDamage = 60;
+
+	public float joinDistance = 10.0f;
 	public float maxHealth = 100;
 	public float health;
 
 	public bool isDead;
 
-	public float attackDamage = 60;
 
 	// TODO: plug logic to calculate attack damage from upgrade level
 	public int healthUpgradeLevel = 1;
@@ -192,7 +194,7 @@ public class Unit : MonoBehaviour {
 
 			if (enemy && !enemy.isDead){
 				// TODO: Play Attack Anim
-				yield return new WaitForSeconds(0.3f);
+				yield return new WaitForSeconds(attackSpeed);
 				AttackEnemy();
 			}
 
@@ -413,7 +415,7 @@ public class Unit : MonoBehaviour {
 	}
 
 	private void AttackEnemy () {
-		enemy.TakeDamage(attackDamage, this);
+		enemy.TakeDamage(attackDamage * attackSpeed, this);
 		if (enemy.isDead && !isDead){
 			nextState = UnitState.Idle;
 			enemy = null;

@@ -11,7 +11,8 @@ public class GameLogic : MonoBehaviour {
 	public Battalion playerBattalion;
 	public Battalion enemyBattalion;
 
-	public Unit playerUnit;
+	private Unit[] playerUnitPrefabs = new Unit[3];
+
 	public Unit enemyUnit;
 
 	public Encounter previousEncounter;
@@ -30,11 +31,11 @@ public class GameLogic : MonoBehaviour {
 		return enemyBattalion.AllUnitsDead();
 	}
 
-	private int scorePerUnit = 100;
-	private int costPerUnit = 50;
+
+	private int costToScoreModifier = 2;
 
 	public void EnemyKilled (Unit u) {
-		score += scorePerUnit;
+		score += u.cost * costToScoreModifier;
 	}
 
 	public void ResourceMined (int value) {
@@ -43,13 +44,13 @@ public class GameLogic : MonoBehaviour {
 
 	// Plugs to the UI
 
-	public void AddPlayerUnit () {
-		score -= costPerUnit;
-		AddPlayerUnitWithoutCost();
+	public void AddPlayerUnit (UnitType type) {
+		score -= playerUnitPrefabs[(int)type].cost;
+		AddPlayerUnitWithoutCost(type);
 	}
 
-	private void AddPlayerUnitWithoutCost () {
-		Unit u = Instantiate(playerUnit) as Unit;
+	private void AddPlayerUnitWithoutCost (UnitType type) {
+		Unit u = Instantiate(playerUnitPrefabs[(int)type]) as Unit;
 		u.AddToBattalion(playerBattalion);
 	}
 
@@ -62,14 +63,15 @@ public class GameLogic : MonoBehaviour {
 		round = 0;
 	}
 
+	public string DescriptionForUnitType (UnitType type) {
+		return playerUnitPrefabs[(int)type].Description();
+	}
+
 	private List<string> unitButtons = new List<string>();
 
 	public List<string> UnitButtons () {
 		return unitButtons;
 	}
-
-	private int addUnitCost = 50;
-
 
 	private void InitUnitButtons() {
 		unitButtons.Add("AddUnit");	//TODO: To plug different units
@@ -79,16 +81,23 @@ public class GameLogic : MonoBehaviour {
 		unitButtons.Add(name);
 	}
 
-	public bool UnitButtonIsAvailable (string name) {
-		return score >= addUnitCost;
+	public bool UnitButtonIsAvailable (UnitType type) {
+		return score >= playerUnitPrefabs[(int)type].cost;
 	}
 
 	// Routines
 
 	private void Awake () {
+		LoadUnitPrefabs();
 		InitEntityPool();
 		InitializeFirstEncounter();
 		InitUnitButtons();
+	}
+
+	private void LoadUnitPrefabs () {
+		playerUnitPrefabs[0] = (Resources.Load("PlayerUnitBox", typeof(GameObject)) as GameObject).GetComponent<Unit>();
+		playerUnitPrefabs[1] = (Resources.Load("PlayerUnitTriangle", typeof(GameObject)) as GameObject).GetComponent<Unit>();
+		playerUnitPrefabs[2] = (Resources.Load("PlayerUnitSphere", typeof(GameObject)) as GameObject).GetComponent<Unit>();
 	}
 
 	private void InitializeFirstEncounter() {
@@ -103,11 +112,11 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private IEnumerator TestAddPlayerUnit () {
-		AddPlayerUnitWithoutCost();
+		AddPlayerUnitWithoutCost(UnitType.Box);
 		yield return new WaitForSeconds(0.5f);
-		AddPlayerUnitWithoutCost();
+		AddPlayerUnitWithoutCost(UnitType.Triangle);
 		yield return new WaitForSeconds(0.5f);
-		AddPlayerUnitWithoutCost();
+		AddPlayerUnitWithoutCost(UnitType.Sphere);
 	}
 
 	private void Update () {

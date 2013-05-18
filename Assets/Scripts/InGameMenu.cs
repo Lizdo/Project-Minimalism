@@ -45,6 +45,9 @@ public class InGameMenu : MonoBehaviour {
 
 	private Color moneyLabelColor = ColorWithHex(0x528D35);
 	private Color roundLabelColor = ColorWithHex(0x3C3F39);
+	private Color secondaryTextColor = ColorWithHex(0xC6CDC8);
+
+
 	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
 	
 	private void RestoreGUIColor () {
@@ -78,14 +81,21 @@ public class InGameMenu : MonoBehaviour {
 				padding + i * (unitIconSize + padding),
 				unitIconSize,
 				unitIconSize);
-			DrawAUnitButton(r, buttons[i]);
+			UnitType type = (UnitType)i;
+			DrawAUnitButton(r, buttons[i], type);
+
+			Rect decriptionRect = new Rect(padding + unitIconSize + padding,
+				padding,
+				labelWidth,
+				smallFontSize);
+			DrawAUnitButtonDescription(decriptionRect, type);
 		}
 	}
 
-	private void DrawAUnitButton (Rect r, string s){
-		if (gameLogic.UnitButtonIsAvailable(s)){
+	private void DrawAUnitButton (Rect r, string s, UnitType type){
+		if (gameLogic.UnitButtonIsAvailable(type)){
 			if (GUI.Button(r, icons[s])){
-				gameLogic.AddPlayerUnit();
+				gameLogic.AddPlayerUnit(type);
 			}
 		}else{
 			GUI.color = disabledColor;
@@ -94,11 +104,17 @@ public class InGameMenu : MonoBehaviour {
 		}
 	}
 
+	private void DrawAUnitButtonDescription (Rect r, UnitType type){
+		GUI.Label(r, gameLogic.DescriptionForUnitType(type), unitLabelStyle);
+
+	}
+
 
 	// GUI Styles
 
 	private GUIStyle moneyLabelStyle;
 	private GUIStyle roundLabelStyle;
+	private GUIStyle unitLabelStyle;
 
 	private void InitGUIStyles () {
 		moneyLabelStyle = new GUIStyle();
@@ -110,6 +126,12 @@ public class InGameMenu : MonoBehaviour {
 		roundLabelStyle.fontSize = largeFontSize;
 		roundLabelStyle.alignment = TextAnchor.UpperCenter;
 		roundLabelStyle.normal.textColor = roundLabelColor;
+
+
+		unitLabelStyle = new GUIStyle();
+		unitLabelStyle.fontSize = smallFontSize;
+		unitLabelStyle.alignment = TextAnchor.UpperLeft;
+		unitLabelStyle.normal.textColor = secondaryTextColor;
 	}
 
 	private Rect moneyLabelRect;

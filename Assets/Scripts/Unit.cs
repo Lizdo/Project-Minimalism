@@ -1,6 +1,12 @@
 using UnityEngine;
 using System.Collections;
 
+public enum UnitType{
+	Box = 0,
+	Triangle = 1,
+	Sphere = 2
+}
+
 public class Unit : MonoBehaviour {
 
 	// High level behavior is controlled by Battalion, Unit will take care of low level behavior like movement, attack...etc
@@ -25,6 +31,8 @@ public class Unit : MonoBehaviour {
 	public float speed = 30.0f;
 	public float turningSpeed = 5.0f;
 	public int size = 1;
+	public int cost = 50;
+	public UnitType type;
 
 	public float attackDistance = 30.0f;
 	public float attackSpeed = 0.1f;	// Time Per Attack
@@ -101,20 +109,24 @@ public class Unit : MonoBehaviour {
 		UpdateHealthVisual();
 	}
 
+	public virtual string Description () {
+		return "Cost: " + cost.ToString();
+	}
+
 
 	///////////////////////////
 	//  Core Updates
 	///////////////////////////
 		
 
-	private void Awake () {
+	protected virtual void Awake () {
 		RandomizeOffset();
 		RandomizeRotation();
 		health = maxHealth;
 		initialColor = renderer.sharedMaterial.color;
 	}
 
-	private void Start () {		
+	protected virtual void Start () {		
 	}
 
 

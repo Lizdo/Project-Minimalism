@@ -30,7 +30,7 @@ public class Unit : MonoBehaviour {
 
 	public float speed = 30.0f;
 	public float turningSpeed = 5.0f;
-	public int size = 1;
+	public float size = 1.0f;
 	public int cost = 50;
 	public UnitType type;
 
@@ -126,7 +126,10 @@ public class Unit : MonoBehaviour {
 		initialColor = renderer.sharedMaterial.color;
 	}
 
-	protected virtual void Start () {		
+	protected virtual void Start () {
+		Vector3 boundSize = renderer.bounds.size;
+		Vector2 projectedTo2D = new Vector2(boundSize.x, boundSize.z);
+		size = projectedTo2D.magnitude;
 	}
 
 

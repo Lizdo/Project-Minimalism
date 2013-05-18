@@ -10,7 +10,9 @@ public class InGameMenu : MonoBehaviour {
 	private GUISkin skin;
 
 	private float padding = 10.0f;
+	private float textPaddingFromIcon = 5.0f;
 	private float unitIconSize = 80.0f;
+	private float upgradeIconSize = 60.0f;
 	
 	private float labelWidth = 100.0f;
 
@@ -38,41 +40,14 @@ public class InGameMenu : MonoBehaviour {
 		GUI.skin = skin;
 
 		DrawUnitButtons();
-		
+		DrawUpgradeButtons();
+
 		GUI.Label(moneyLabelRect, "$" + gameLogic.score.ToString(), moneyLabelStyle);
 		GUI.Label(roundLabelRect, "Round " + (gameLogic.round + 1).ToString(), roundLabelStyle);
 	}
 
-	private Color moneyLabelColor = ColorWithHex(0x528D35);
-	private Color roundLabelColor = ColorWithHex(0x3C3F39);
-	private Color secondaryTextColor = ColorWithHex(0xC6CDC8);
 
-
-	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
-	
-	private void RestoreGUIColor () {
-		GUI.color = Color.white;
-	}
-
-
-	static Color ColorWithHex(int hex){
-	    // 0xRRGGBB
-	    float r = ((hex & 0xFF0000) >> 16)/255.0f;
-	    float g = ((hex & 0xFF00) >> 8)/255.0f;
-	    float b = (hex & 0xFF)/255.0f;
-	    return new Color(r,g,b,1.0f);
-	}
-
-	private static string[] iconNames= {
-		"AddUnit"
-	};
-
-	private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
-
-	private void LoadIcons() {
-		icons.Add(iconNames[0], Resources.Load(iconNames[0], typeof(Texture2D)) as Texture2D);
-	}
-
+	// Unit Buttons
 
 	private void DrawUnitButtons () {
 		List <string> buttons = gameLogic.UnitButtons();
@@ -85,7 +60,7 @@ public class InGameMenu : MonoBehaviour {
 			DrawAUnitButton(r, buttons[i], type);
 
 			Rect decriptionRect = new Rect(padding + unitIconSize + padding,
-				padding,
+				padding + i * (unitIconSize + padding) + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);
 			DrawAUnitButtonDescription(decriptionRect, type);
@@ -93,21 +68,62 @@ public class InGameMenu : MonoBehaviour {
 	}
 
 	private void DrawAUnitButton (Rect r, string s, UnitType type){
-		if (gameLogic.UnitButtonIsAvailable(type)){
-			if (GUI.Button(r, icons[s])){
+		if (gameLogic.IsUnitButtonAvailable(type)){
+			if (GUI.Button(r, IconWithName(s))){
 				gameLogic.AddPlayerUnit(type);
 			}
 		}else{
 			GUI.color = disabledColor;
-			GUI.Button(r, icons[s]);
+			GUI.Button(r, IconWithName(s));
 			RestoreGUIColor();
 		}
 	}
 
 	private void DrawAUnitButtonDescription (Rect r, UnitType type){
 		GUI.Label(r, gameLogic.DescriptionForUnitType(type), unitLabelStyle);
-
 	}
+
+
+	// Upgrade Buttons
+
+	private void DrawUpgradeButtons () {
+		List <Upgrade> nextUpgrades = gameLogic.nextUpgrades;
+		float unitButtonSectionSize = (padding + unitIconSize) * 3 + padding;
+
+		for (int i = 0; i < nextUpgrades.Count; i++){
+			Upgrade u = nextUpgrades[i];
+
+			Rect r = new Rect(padding,
+				unitButtonSectionSize + i * (upgradeIconSize + padding),
+				upgradeIconSize,
+				upgradeIconSize);
+			DrawAUpgradeButton(r, u);
+
+
+			Rect decriptionRect = new Rect(padding + upgradeIconSize + padding,
+				unitButtonSectionSize + i * (upgradeIconSize + padding) + textPaddingFromIcon,
+				labelWidth,
+				smallFontSize);
+			DrawAUpgradeButtonDescription(decriptionRect, u);
+		}
+	}
+
+	private void DrawAUpgradeButton (Rect r, Upgrade u) {
+		if (gameLogic.IsUpgradeButtonAvailable(u)){
+			if (GUI.Button(r, IconWithName(u.id))){
+				gameLogic.UnlockUpgrade(u);
+			}
+		}else{
+			GUI.color = disabledColor;
+			GUI.Button(r, IconWithName(u.id));
+			RestoreGUIColor();
+		}
+	}
+
+	private void DrawAUpgradeButtonDescription (Rect r, Upgrade u) {
+		GUI.Label(r, u.description, unitLabelStyle);
+	}
+
 
 
 	// GUI Styles
@@ -148,6 +164,50 @@ public class InGameMenu : MonoBehaviour {
 			labelWidth,
 			largeFontSize);
 	}
+
+
+
+	// Helper Functions
+
+	private Color moneyLabelColor = ColorWithHex(0x528D35);
+	private Color roundLabelColor = ColorWithHex(0x3C3F39);
+	private Color secondaryTextColor = ColorWithHex(0xC6CDC8);
+
+
+	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
+	
+	private void RestoreGUIColor () {
+		GUI.color = Color.white;
+	}
+
+	static Color ColorWithHex(int hex){
+	    // 0xRRGGBB
+	    float r = ((hex & 0xFF0000) >> 16)/255.0f;
+	    float g = ((hex & 0xFF00) >> 8)/255.0f;
+	    float b = (hex & 0xFF)/255.0f;
+	    return new Color(r,g,b,1.0f);
+	}
+
+
+	// Load/Unload
+
+	private static string[] iconNames= {
+		"AddUnit"
+	};
+
+	private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
+
+	private void LoadIcons() {
+		icons.Add(iconNames[0], Resources.Load(iconNames[0], typeof(Texture2D)) as Texture2D);
+	}
+
+	private Texture2D IconWithName(string s){
+		if (icons.ContainsKey(s)){
+			return icons[s];
+		}
+		return icons["AddUnit"];
+	}
+
 	
 
 }

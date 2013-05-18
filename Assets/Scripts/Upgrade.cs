@@ -1,0 +1,28 @@
+using UnityEngine;
+using System.Collections;
+
+public class Upgrade {
+	public string id;
+	public string description;
+	public bool unlocked;
+	public int cost = 200;
+
+	public Upgrade prequisite;
+
+	public Upgrade (string _id, string _description) {
+		id = _id;
+		description = _description;
+	}
+
+	public bool IsAvailableToUnlock () {
+		if (unlocked){
+			return false;
+		}
+
+		if (prequisite != null && !prequisite.unlocked){
+			return false;
+		}
+
+		return true;
+	}
+}

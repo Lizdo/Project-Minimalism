@@ -63,6 +63,83 @@ public class GameLogic : MonoBehaviour {
 		round = 0;
 	}
 
+	// Upgrades
+
+	private List<Upgrade> upgrades = new List<Upgrade>();
+	private int availableUpgradeCount = 3;
+
+	public List<Upgrade> nextUpgrades = new List<Upgrade>(); // Used by UI
+
+
+	public const string kUnlockTriangleUnit = "UnlockTriangleUnit";
+	public const string kUnlockSphereUnit = "UnlockSphereUnit";
+	public const string kUnlockBoxAbility1 = "UnlockBoxAbility1";
+	public const string kUnlockBoxAbility2 = "UnlockBoxAbility2";
+	public const string kUnlockHealthLevel1 = "UnlockHealthLevel1";
+	public const string kUnlockTriangleAbility1 = "UnlockTriangleAbility1";
+	public const string kUnlockTriangleAbility2 = "UnlockTriangleAbility2";
+
+
+	private void InitUpgrades () {
+		upgrades.Add(new Upgrade(kUnlockTriangleUnit, "Unlock new unit type: Triangle"));
+
+		upgrades.Add(new Upgrade(kUnlockBoxAbility1, "Unlock Box Ability 1"));
+		upgrades.Add(new Upgrade(kUnlockSphereUnit, "Unlock new unit type: Sphere"));
+		upgrades.Add(new Upgrade(kUnlockBoxAbility2, "Unlock Box Ability 2"));
+		upgrades.Add(new Upgrade(kUnlockHealthLevel1, "Increase all units health level"));
+
+		upgrades.Add(new Upgrade(kUnlockTriangleAbility1, "Unlock Triangle Ability 1"));
+		upgrades.Add(new Upgrade(kUnlockTriangleAbility2, "Unlock Triangle Ability 2"));
+
+		// Setup relationship
+		UpgradeWithID(kUnlockTriangleAbility1).prequisite = UpgradeWithID(kUnlockTriangleUnit);
+		UpgradeWithID(kUnlockTriangleAbility2).prequisite = UpgradeWithID(kUnlockTriangleUnit);
+
+		UpdateNextUpgrades();
+	}
+
+	private void UpdateNextUpgrades () {
+		nextUpgrades.Clear();
+
+		for (int i = 0; i < upgrades.Count; i++){
+			if (upgrades[i].IsAvailableToUnlock()){
+				nextUpgrades.Add(upgrades[i]);
+			}
+
+			if (nextUpgrades.Count >= availableUpgradeCount){
+				return;
+			}
+		}
+	}
+
+	private Upgrade UpgradeWithID (string _id) {
+		foreach (Upgrade u in upgrades){
+			if (u.id == _id){
+				return u;
+			}
+		}
+		return null;
+	}
+
+	public bool IsUpgradeUnlocked (string _id) {
+		return UpgradeWithID(_id).unlocked;
+	}
+
+
+	public void UnlockUpgrade (Upgrade u) {
+		DebugHelper.Assert(u.unlocked == false);
+		score -= u.cost;
+		u.unlocked = true;
+		UpdateNextUpgrades();
+	}
+
+	public bool IsUpgradeButtonAvailable (Upgrade _u) {
+		return score >= _u.cost;
+	}
+
+
+	// Unit Buttons
+
 	public string DescriptionForUnitType (UnitType type) {
 		return playerUnitPrefabs[(int)type].Description();
 	}
@@ -81,7 +158,7 @@ public class GameLogic : MonoBehaviour {
 		unitButtons.Add(name);
 	}
 
-	public bool UnitButtonIsAvailable (UnitType type) {
+	public bool IsUnitButtonAvailable (UnitType type) {
 		return score >= playerUnitPrefabs[(int)type].cost;
 	}
 
@@ -92,6 +169,7 @@ public class GameLogic : MonoBehaviour {
 		InitEntityPool();
 		InitializeFirstEncounter();
 		InitUnitButtons();
+		InitUpgrades();
 	}
 
 	private void LoadUnitPrefabs () {

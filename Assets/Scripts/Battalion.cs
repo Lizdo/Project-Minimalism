@@ -154,13 +154,14 @@ public class Battalion : MonoBehaviour {
 		return (center - unit.transform.position) / 100;
 	}
 
-	private float distanceBetweenUnits = 3.0f;
+	private float distanceBufferBtweenUnits = 0.2f;
 
 	public Vector3 SeparationVelocity (Unit unit) {
 		Vector3 c = Vector3.zero;
 		foreach (Unit u in units){
 			if (u != unit){
-				if (u.DistanceToUnit(unit) < distanceBetweenUnits){
+				float minimumDistanceBetweenUnits = Mathf.Max(unit.size, u.size) + distanceBufferBtweenUnits;
+				if (u.DistanceToUnit(unit) < minimumDistanceBetweenUnits){
 					c = c - (u.transform.position - unit.transform.position);
 				}
 			}

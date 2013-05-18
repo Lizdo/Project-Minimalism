@@ -151,7 +151,7 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private void InitUnitButtons() {
-		unitButtons.Add("AddUnit");	//TODO: To plug different units
+		unitButtons.Add("UnitBox");	//TODO: To plug different units
 	}
 
 	private void UnlockUnit (string name) {

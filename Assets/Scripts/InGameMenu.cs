@@ -192,20 +192,25 @@ public class InGameMenu : MonoBehaviour {
 	// Load/Unload
 
 	private static string[] iconNames= {
-		"AddUnit"
+		"AddUnit",
+		"UnitBox",
+		"UnitTriangle",
+		"UnitSphere"
 	};
 
 	private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
 
 	private void LoadIcons() {
-		icons.Add(iconNames[0], Resources.Load(iconNames[0], typeof(Texture2D)) as Texture2D);
+		for (int i = 0; i < iconNames.Length; i++){
+			icons.Add(iconNames[i], Resources.Load(iconNames[i], typeof(Texture2D)) as Texture2D);
+		}
 	}
 
 	private Texture2D IconWithName(string s){
 		if (icons.ContainsKey(s)){
 			return icons[s];
 		}
-		return icons["AddUnit"];
+		return icons["UnitBox"];
 	}
 
 	

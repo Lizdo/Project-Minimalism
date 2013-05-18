@@ -62,12 +62,33 @@ public class GameLogic : MonoBehaviour {
 		round = 0;
 	}
 
+	private List<string> unitButtons = new List<string>();
+
+	public List<string> UnitButtons () {
+		return unitButtons;
+	}
+
+	private int addUnitCost = 50;
+
+
+	private void InitUnitButtons() {
+		unitButtons.Add("AddUnit");	//TODO: To plug different units
+	}
+
+	private void UnlockUnit (string name) {
+		unitButtons.Add(name);
+	}
+
+	public bool UnitButtonIsAvailable (string name) {
+		return score >= addUnitCost;
+	}
 
 	// Routines
 
 	private void Awake () {
 		InitEntityPool();
 		InitializeFirstEncounter();
+		InitUnitButtons();
 	}
 
 	private void InitializeFirstEncounter() {

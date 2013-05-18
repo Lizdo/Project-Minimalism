@@ -20,7 +20,7 @@ public class InGameMenu : MonoBehaviour {
 	private void Awake () {
 		gameLogic = GetComponent<GameLogic>();
 		InitGUIStyles();
-		InitGuiRects();
+		InitGUIRects();
 	}
 
 	// Use this for initialization
@@ -37,16 +37,7 @@ public class InGameMenu : MonoBehaviour {
 	void OnGUI () {
 		GUI.skin = skin;
 
-		if (CanAddUnit()){
-			if (GUI.Button (new Rect (padding,padding,unitIconSize,unitIconSize), new GUIContent ("Add Unit\n(Cost 50)", icons[iconNames[0]]))){
-				gameLogic.AddPlayerUnit();
-			}	
-		}else{
-			GUI.color = disabledColor;
-			GUI.Button (new Rect (padding,padding,unitIconSize,unitIconSize), new GUIContent ("Add Unit\n(Cost 50)", icons[iconNames[0]]));
-			RestoreGUIColor();
-
-		}
+		DrawUnitButtons();
 		
 		GUI.Label(moneyLabelRect, "$" + gameLogic.score.ToString(), moneyLabelStyle);
 		GUI.Label(roundLabelRect, "Round " + (gameLogic.round + 1).ToString(), roundLabelStyle);
@@ -57,7 +48,7 @@ public class InGameMenu : MonoBehaviour {
 	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
 	
 	private void RestoreGUIColor () {
-		GUI.color = Color.white;	
+		GUI.color = Color.white;
 	}
 
 
@@ -69,13 +60,6 @@ public class InGameMenu : MonoBehaviour {
 	    return new Color(r,g,b,1.0f);
 	}
 
-
-	private int addUnitCost = 50;
-
-	private bool CanAddUnit() {
-		return gameLogic.score >= addUnitCost;
-	}
-
 	private static string[] iconNames= {
 		"AddUnit"
 	};
@@ -84,6 +68,30 @@ public class InGameMenu : MonoBehaviour {
 
 	private void LoadIcons() {
 		icons.Add(iconNames[0], Resources.Load(iconNames[0], typeof(Texture2D)) as Texture2D);
+	}
+
+
+	private void DrawUnitButtons () {
+		List <string> buttons = gameLogic.UnitButtons();
+		for (int i = 0; i < buttons.Count; i++){
+			Rect r = new Rect(padding, 
+				padding + i * (unitIconSize + padding),
+				unitIconSize,
+				unitIconSize);
+			DrawAUnitButton(r, buttons[i]);
+		}
+	}
+
+	private void DrawAUnitButton (Rect r, string s){
+		if (gameLogic.UnitButtonIsAvailable(s)){
+			if (GUI.Button(r, icons[s])){
+				gameLogic.AddPlayerUnit();
+			}
+		}else{
+			GUI.color = disabledColor;
+			GUI.Button(r, icons[s]);
+			RestoreGUIColor();
+		}
 	}
 
 
@@ -107,7 +115,7 @@ public class InGameMenu : MonoBehaviour {
 	private Rect moneyLabelRect;
 	private Rect roundLabelRect;
 
-	private void InitGuiRects () {
+	private void InitGUIRects () {
 		moneyLabelRect = new Rect(Screen.width - padding - labelWidth,
 			padding,
 			labelWidth,

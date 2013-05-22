@@ -13,7 +13,9 @@ public class InGameMenu : MonoBehaviour {
 	private float textPaddingFromIcon = 5.0f;
 	private float unitIconSize = 80.0f;
 	private float upgradeIconSize = 40.0f;
-	
+
+	private float paddingBetweenUnitButtonAndUpgradeButton = 20.0f;
+
 	private float labelWidth = 100.0f;
 
 	private int smallFontSize = 12;
@@ -59,8 +61,8 @@ public class InGameMenu : MonoBehaviour {
 			UnitType type = (UnitType)i;
 			DrawAUnitButton(r, buttons[i], type);
 
-			Rect decriptionRect = new Rect(padding + unitIconSize + padding,
-				padding + i * (unitIconSize + padding) + textPaddingFromIcon,
+			Rect decriptionRect = new Rect(r.x + r.width + padding,
+				r.y + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);
 			DrawAUnitButtonDescription(decriptionRect, type);
@@ -93,15 +95,15 @@ public class InGameMenu : MonoBehaviour {
 		for (int i = 0; i < nextUpgrades.Count; i++){
 			Upgrade u = nextUpgrades[i];
 
-			Rect r = new Rect(padding,
-				unitButtonSectionSize + i * (upgradeIconSize + padding),
+			Rect r = new Rect(padding + unitIconSize - upgradeIconSize,
+				unitButtonSectionSize + i * (upgradeIconSize + padding) + paddingBetweenUnitButtonAndUpgradeButton,
 				upgradeIconSize,
 				upgradeIconSize);
 			DrawAUpgradeButton(r, u);
 
 
-			Rect decriptionRect = new Rect(padding + upgradeIconSize + padding,
-				unitButtonSectionSize + i * (upgradeIconSize + padding) + textPaddingFromIcon,
+			Rect decriptionRect = new Rect(r.x + r.width + padding,
+				r.y + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);
 			DrawAUpgradeButtonDescription(decriptionRect, u);

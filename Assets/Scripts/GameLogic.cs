@@ -79,6 +79,10 @@ public class GameLogic : MonoBehaviour {
 	public const string kUnlockTriangleAbility1 = "UnlockTriangleAbility1";
 	public const string kUnlockTriangleAbility2 = "UnlockTriangleAbility2";
 
+	public const string kUnitBox = "UnitBox";
+	public const string kUnitTriangle = "UnitTriangle";
+	public const string kUnitSphere = "UnitSphere";
+
 
 	private void InitUpgrades () {
 		upgrades.Add(new Upgrade(kUnlockTriangleUnit, "Unlock new unit type: Triangle"));
@@ -130,6 +134,13 @@ public class GameLogic : MonoBehaviour {
 		DebugHelper.Assert(u.unlocked == false);
 		score -= u.cost;
 		u.unlocked = true;
+
+		if (u.id == kUnlockTriangleUnit){
+			UnlockUnit(kUnitTriangle);
+		}else if (u.id == kUnlockSphereUnit){
+			UnlockUnit(kUnitSphere);			
+		}
+
 		UpdateNextUpgrades();
 	}
 
@@ -151,7 +162,7 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private void InitUnitButtons() {
-		unitButtons.Add("UnitBox");	//TODO: To plug different units
+		unitButtons.Add(kUnitBox);	//TODO: To plug different units
 	}
 
 	private void UnlockUnit (string name) {

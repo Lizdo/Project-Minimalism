@@ -12,7 +12,7 @@ public class InGameMenu : MonoBehaviour {
 	private float padding = 10.0f;
 	private float textPaddingFromIcon = 5.0f;
 	private float unitIconSize = 80.0f;
-	private float upgradeIconSize = 60.0f;
+	private float upgradeIconSize = 40.0f;
 	
 	private float labelWidth = 100.0f;
 
@@ -171,7 +171,7 @@ public class InGameMenu : MonoBehaviour {
 
 	private Color moneyLabelColor = ColorWithHex(0x528D35);
 	private Color roundLabelColor = ColorWithHex(0x3C3F39);
-	private Color secondaryTextColor = ColorWithHex(0xC6CDC8);
+	private Color secondaryTextColor = ColorWithHex(0x9AA09D);
 
 
 	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
@@ -195,7 +195,8 @@ public class InGameMenu : MonoBehaviour {
 		"AddUnit",
 		"UnitBox",
 		"UnitTriangle",
-		"UnitSphere"
+		"UnitSphere",
+		"NotFound"
 	};
 
 	private Dictionary<string, Texture2D> icons = new Dictionary<string, Texture2D>();
@@ -210,7 +211,7 @@ public class InGameMenu : MonoBehaviour {
 		if (icons.ContainsKey(s)){
 			return icons[s];
 		}
-		return icons["UnitBox"];
+		return icons["NotFound"];
 	}
 
 	

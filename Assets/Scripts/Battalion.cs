@@ -154,7 +154,7 @@ public class Battalion : MonoBehaviour {
 		return (center - unit.transform.position) / 100;
 	}
 
-	private float distanceBufferBtweenUnits = 0.2f;
+	private float distanceBufferBtweenUnits = 0.5f;
 
 	public Vector3 SeparationVelocity (Unit unit) {
 		Vector3 c = Vector3.zero;

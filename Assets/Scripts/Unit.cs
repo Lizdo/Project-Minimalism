@@ -109,6 +109,15 @@ public class Unit : MonoBehaviour {
 		UpdateHealthVisual();
 	}
 
+	public void Heal (float amount, Unit source) {
+		health += amount;
+		if (health >= maxHealth){
+			health = maxHealth;
+		}
+		UpdateHealthVisual();	
+	}
+
+
 	public virtual string Description () {
 		return "Cost: " + cost.ToString();
 	}
@@ -127,9 +136,15 @@ public class Unit : MonoBehaviour {
 	}
 
 	protected virtual void Start () {
-		Vector3 boundSize = renderer.bounds.size;
-		Vector2 projectedTo2D = new Vector2(boundSize.x, boundSize.z);
+		Vector3 boundExtents = renderer.bounds.extents;
+		Vector2 projectedTo2D = new Vector2(boundExtents.x, boundExtents.z);
 		size = projectedTo2D.magnitude;
+	}
+
+	protected virtual void Update () {
+		DebugHelper.DrawLine(transform.position,
+			transform.position + new Vector3(size, 0, 0));
+
 	}
 
 
@@ -148,6 +163,8 @@ public class Unit : MonoBehaviour {
 
 		while (nextState == UnitState.Invalid){
 		// Execute State
+			RegenerateHealth();
+
 			if (!IsAtMovementTarget()){
 				nextState = UnitState.Moving;
 			}
@@ -169,6 +186,8 @@ public class Unit : MonoBehaviour {
 
 		while (nextState == UnitState.Invalid){
 		// Execute State
+			RegenerateHealth();
+
 			if (IsAtMovementTarget()){
 				nextState = UnitState.Idle;
 			}
@@ -457,6 +476,14 @@ public class Unit : MonoBehaviour {
 		renderer.material.color = Color.Lerp(initialColor, Color.white, 1-health/maxHealth);
 	}
 	
+	private float healthRegenRatioPerSec = 0.1f; // 10% per sec
+
+	private void RegenerateHealth () {
+		float HPtoRegen = healthRegenRatioPerSec * maxHealth * Time.deltaTime;
+		Heal(HPtoRegen, this);
+	}
+
+
 
 	private void Die () {
 		if (isDead){

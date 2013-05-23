@@ -118,9 +118,15 @@ public class Unit : MonoBehaviour {
 	}
 
 
-	public virtual string Description () {
+	public virtual string CostDescription () {
 		return "Cost: " + cost.ToString();
 	}
+
+	public virtual string Description () {
+		return "";
+	}
+
+
 
 
 	///////////////////////////

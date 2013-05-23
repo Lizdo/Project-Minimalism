@@ -155,6 +155,10 @@ public class GameLogic : MonoBehaviour {
 		return playerUnitPrefabs[(int)type].Description();
 	}
 
+	public string CostDescriptionForUnitType (UnitType type) {
+		return playerUnitPrefabs[(int)type].CostDescription();
+	}	
+
 	private List<string> unitButtons = new List<string>();
 
 	public List<string> UnitButtons () {

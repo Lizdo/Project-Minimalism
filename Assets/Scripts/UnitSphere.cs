@@ -14,6 +14,6 @@ public class UnitSphere : Unit {
 	}
 
 	public override string Description () {
-		return base.Description() + " Advanced unit";
+		return base.Description() + "Advanced unit";
 	}
 }

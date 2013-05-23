@@ -14,7 +14,7 @@ public class UnitBox : Unit {
 	}
 
 	public override string Description () {
-		return base.Description() + " Basic unit";
+		return base.Description() + "Basic unit";
 	}
 
 }

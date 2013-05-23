@@ -14,7 +14,7 @@ public class UnitTriangle : Unit {
 	}
 
 	public override string Description () {
-		return base.Description() + " Intermediate unit";
+		return base.Description() + "Intermediate unit";
 	}
 
 }

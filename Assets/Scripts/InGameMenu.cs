@@ -61,11 +61,18 @@ public class InGameMenu : MonoBehaviour {
 			UnitType type = (UnitType)i;
 			DrawAUnitButton(r, buttons[i], type);
 
-			Rect decriptionRect = new Rect(r.x + r.width + padding,
+			Rect costDecriptionRect = new Rect(r.x + r.width + padding,
 				r.y + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);
+			DrawAUnitButtonCostDescription(costDecriptionRect, type);
+
+			Rect decriptionRect = new Rect(r.x + r.width + padding,
+				r.y + textPaddingFromIcon + smallFontSize,
+				labelWidth,
+				smallFontSize);
 			DrawAUnitButtonDescription(decriptionRect, type);
+
 		}
 	}
 
@@ -79,6 +86,10 @@ public class InGameMenu : MonoBehaviour {
 			GUI.Button(r, IconWithName(s));
 			RestoreGUIColor();
 		}
+	}
+
+	private void DrawAUnitButtonCostDescription (Rect r, UnitType type){
+		GUI.Label(r, gameLogic.CostDescriptionForUnitType(type), unitCostLabelStyle);
 	}
 
 	private void DrawAUnitButtonDescription (Rect r, UnitType type){
@@ -101,9 +112,15 @@ public class InGameMenu : MonoBehaviour {
 				upgradeIconSize);
 			DrawAUpgradeButton(r, u);
 
+			Rect costDecriptionRect = new Rect(r.x + r.width + padding,
+				r.y + textPaddingFromIcon,
+				labelWidth,
+				smallFontSize);
+			DrawAUpgradeButtonCostDescription(costDecriptionRect, u);			
+
 
 			Rect decriptionRect = new Rect(r.x + r.width + padding,
-				r.y + textPaddingFromIcon,
+				r.y + textPaddingFromIcon + smallFontSize,
 				labelWidth,
 				smallFontSize);
 			DrawAUpgradeButtonDescription(decriptionRect, u);
@@ -122,6 +139,11 @@ public class InGameMenu : MonoBehaviour {
 		}
 	}
 
+	private void DrawAUpgradeButtonCostDescription (Rect r, Upgrade u) {
+		GUI.Label(r, u.CostDescription(), unitCostLabelStyle);
+	}
+
+
 	private void DrawAUpgradeButtonDescription (Rect r, Upgrade u) {
 		GUI.Label(r, u.description, unitLabelStyle);
 	}
@@ -132,6 +154,7 @@ public class InGameMenu : MonoBehaviour {
 
 	private GUIStyle moneyLabelStyle;
 	private GUIStyle roundLabelStyle;
+	private GUIStyle unitCostLabelStyle;
 	private GUIStyle unitLabelStyle;
 
 	private void InitGUIStyles () {
@@ -150,6 +173,12 @@ public class InGameMenu : MonoBehaviour {
 		unitLabelStyle.fontSize = smallFontSize;
 		unitLabelStyle.alignment = TextAnchor.UpperLeft;
 		unitLabelStyle.normal.textColor = secondaryTextColor;
+
+		unitCostLabelStyle = new GUIStyle();
+		unitCostLabelStyle.fontSize = smallFontSize;
+		unitCostLabelStyle.alignment = TextAnchor.UpperLeft;
+		unitCostLabelStyle.normal.textColor = costLabelColor;
+		//unitCostLabelStyle.fontStyle = FontStyle.Bold;
 	}
 
 	private Rect moneyLabelRect;
@@ -173,6 +202,7 @@ public class InGameMenu : MonoBehaviour {
 
 	private Color moneyLabelColor = ColorWithHex(0x528D35);
 	private Color roundLabelColor = ColorWithHex(0x3C3F39);
+	private Color costLabelColor = ColorWithHex(0x528D35);
 	private Color secondaryTextColor = ColorWithHex(0x9AA09D);
 
 

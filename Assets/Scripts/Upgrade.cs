@@ -25,4 +25,8 @@ public class Upgrade {
 
 		return true;
 	}
+
+	public string CostDescription () {
+		return "Cost: " + cost.ToString();
+	}
 }

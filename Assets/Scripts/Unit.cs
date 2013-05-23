@@ -371,8 +371,7 @@ public class Unit : MonoBehaviour {
 		if (isEnemy)
 			return true;
 
-		Vector3 targetPosition = battalion.MovementTarget();
-		if (Vector3.Distance(transform.position, targetPosition) <= MOVEMENT_TOLERANCE){
+		if (Vector3.Distance(transform.position, IdleMovementTarget()) <= MOVEMENT_TOLERANCE){
 			return true;
 		}
 		return false;
@@ -380,6 +379,8 @@ public class Unit : MonoBehaviour {
 
 	private void MoveToTargetPosition (Vector3 targetPosition) {
 		RotateTowardsTarget(targetPosition);
+
+		DebugHelper.DrawCross(targetPosition);
 
 		if (useBoid){
 			MoveToTargetUsingBoid(targetPosition);
@@ -445,7 +446,12 @@ public class Unit : MonoBehaviour {
 
 	private void MoveToBattalionMovementTarget () {
 		highPriorityMovementTarget = false;
-		MoveToTargetPosition(battalion.MovementTarget());
+		MoveToTargetPosition(IdleMovementTarget());
+	}
+
+	private Vector3 IdleMovementTarget () {
+		Vector3 offsetFromBattalion = transform.position - battalion.bounds.center;
+		return battalion.MovementTarget() + offsetFromBattalion;
 	}
 
 	private void AttackEnemy () {

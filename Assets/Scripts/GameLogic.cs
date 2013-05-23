@@ -203,9 +203,9 @@ public class GameLogic : MonoBehaviour {
 	private IEnumerator TestAddPlayerUnit () {
 		AddPlayerUnitWithoutCost(UnitType.Box);
 		yield return new WaitForSeconds(0.5f);
-		AddPlayerUnitWithoutCost(UnitType.Triangle);
+		AddPlayerUnitWithoutCost(UnitType.Box);
 		yield return new WaitForSeconds(0.5f);
-		AddPlayerUnitWithoutCost(UnitType.Sphere);
+		AddPlayerUnitWithoutCost(UnitType.Box);
 	}
 
 	private void Update () {

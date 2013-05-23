@@ -4,8 +4,12 @@ using System.Collections;
 public class Upgrade {
 	public string id;
 	public string description;
+	public int idX;
+	public int idY;
 	public bool unlocked;
 	public int cost = 200;
+
+	public int numberOfChildUpgrades;
 
 	public Upgrade prequisite;
 

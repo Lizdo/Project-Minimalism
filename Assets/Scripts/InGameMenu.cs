@@ -21,6 +21,8 @@ public class InGameMenu : MonoBehaviour {
 	private int smallFontSize = 12;
 	private int largeFontSize = 24;
 
+	private bool showUpgradeTree;
+
 	private void Awake () {
 		gameLogic = GetComponent<GameLogic>();
 		InitGUIStyles();
@@ -42,10 +44,12 @@ public class InGameMenu : MonoBehaviour {
 		GUI.skin = skin;
 
 		DrawUnitButtons();
-		DrawUpgradeButtons();
-
-		GUI.Label(moneyLabelRect, "$" + gameLogic.score.ToString(), moneyLabelStyle);
-		GUI.Label(roundLabelRect, "Round " + (gameLogic.round + 1).ToString(), roundLabelStyle);
+		if (showUpgradeTree){
+			DrawUpgradeTree();
+		}else{
+			DrawUpgradeButtons();
+		}
+		DrawGlobalUI();
 	}
 
 
@@ -61,7 +65,13 @@ public class InGameMenu : MonoBehaviour {
 			UnitType type = (UnitType)i;
 			DrawAUnitButton(r, buttons[i], type);
 
-			Rect costDecriptionRect = new Rect(r.x + r.width + padding,
+			Rect nameRect = new Rect(r.x + r.width + padding,
+				r.y + textPaddingFromIcon,
+				labelWidth,
+				smallFontSize);
+			float nameRectWidth = DrawAUnitName(nameRect, type);
+
+			Rect costDecriptionRect = new Rect(r.x + r.width + padding + nameRectWidth + padding,
 				r.y + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);
@@ -88,12 +98,19 @@ public class InGameMenu : MonoBehaviour {
 		}
 	}
 
+	private float DrawAUnitName (Rect r, UnitType type) {
+		GUI.Label(r, type.ToString(), nameLabelStyle);
+		float minWidth, maxWidth;
+		nameLabelStyle.CalcMinMaxWidth(new GUIContent(type.ToString()), out minWidth, out maxWidth);
+		return maxWidth;
+	}
+
 	private void DrawAUnitButtonCostDescription (Rect r, UnitType type){
-		GUI.Label(r, gameLogic.CostDescriptionForUnitType(type), unitCostLabelStyle);
+		GUI.Label(r, gameLogic.CostDescriptionForUnitType(type), costLabelStyle);
 	}
 
 	private void DrawAUnitButtonDescription (Rect r, UnitType type){
-		GUI.Label(r, gameLogic.DescriptionForUnitType(type), unitLabelStyle);
+		GUI.Label(r, gameLogic.DescriptionForUnitType(type), descriptionLabelStyle);
 	}
 
 
@@ -112,22 +129,34 @@ public class InGameMenu : MonoBehaviour {
 				upgradeIconSize);
 			DrawAUpgradeButton(r, u);
 
-			Rect costDecriptionRect = new Rect(r.x + r.width + padding,
+			Rect nameRect = new Rect(r.x + r.width + padding,
 				r.y + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);
-			DrawAUpgradeButtonCostDescription(costDecriptionRect, u);			
+			float nameRectWidth = DrawAUpgradeName(nameRect, u);			
+
+			Rect costRect = new Rect(r.x + r.width + padding + nameRectWidth + padding,
+				r.y + textPaddingFromIcon,
+				labelWidth,
+				smallFontSize);
+			DrawAUpgradeCost(costRect, u);			
 
 
 			Rect decriptionRect = new Rect(r.x + r.width + padding,
 				r.y + textPaddingFromIcon + smallFontSize,
 				labelWidth,
 				smallFontSize);
-			DrawAUpgradeButtonDescription(decriptionRect, u);
+			DrawAUpgradeDescription(decriptionRect, u);
 		}
 	}
 
 	private void DrawAUpgradeButton (Rect r, Upgrade u) {
+		if (u.unlocked){
+			GUI.color = enabledColor;
+			GUI.Button(r, IconWithName(u.id));
+			RestoreGUIColor();
+			return;
+		}
 		if (gameLogic.IsUpgradeButtonAvailable(u)){
 			if (GUI.Button(r, IconWithName(u.id))){
 				gameLogic.UnlockUpgrade(u);
@@ -139,13 +168,21 @@ public class InGameMenu : MonoBehaviour {
 		}
 	}
 
-	private void DrawAUpgradeButtonCostDescription (Rect r, Upgrade u) {
-		GUI.Label(r, u.CostDescription(), unitCostLabelStyle);
+	private float DrawAUpgradeName (Rect r, Upgrade u) {
+		GUI.Label(r, u.id, nameLabelStyle);
+		float minWidth, maxWidth;
+		nameLabelStyle.CalcMinMaxWidth(new GUIContent(u.id), out minWidth, out maxWidth);
+		return maxWidth;
 	}
 
 
-	private void DrawAUpgradeButtonDescription (Rect r, Upgrade u) {
-		GUI.Label(r, u.description, unitLabelStyle);
+	private void DrawAUpgradeCost (Rect r, Upgrade u) {
+		GUI.Label(r, u.CostDescription(), costLabelStyle);
+	}
+
+	
+	private void DrawAUpgradeDescription (Rect r, Upgrade u) {
+		GUI.Label(r, u.description, descriptionLabelStyle);
 	}
 
 
@@ -154,8 +191,9 @@ public class InGameMenu : MonoBehaviour {
 
 	private GUIStyle moneyLabelStyle;
 	private GUIStyle roundLabelStyle;
-	private GUIStyle unitCostLabelStyle;
-	private GUIStyle unitLabelStyle;
+	private GUIStyle costLabelStyle;
+	private GUIStyle descriptionLabelStyle;
+	private GUIStyle nameLabelStyle;
 
 	private void InitGUIStyles () {
 		moneyLabelStyle = new GUIStyle();
@@ -169,20 +207,27 @@ public class InGameMenu : MonoBehaviour {
 		roundLabelStyle.normal.textColor = roundLabelColor;
 
 
-		unitLabelStyle = new GUIStyle();
-		unitLabelStyle.fontSize = smallFontSize;
-		unitLabelStyle.alignment = TextAnchor.UpperLeft;
-		unitLabelStyle.normal.textColor = secondaryTextColor;
+		descriptionLabelStyle = new GUIStyle();
+		descriptionLabelStyle.fontSize = smallFontSize;
+		descriptionLabelStyle.alignment = TextAnchor.UpperLeft;
+		descriptionLabelStyle.normal.textColor = secondaryTextColor;
 
-		unitCostLabelStyle = new GUIStyle();
-		unitCostLabelStyle.fontSize = smallFontSize;
-		unitCostLabelStyle.alignment = TextAnchor.UpperLeft;
-		unitCostLabelStyle.normal.textColor = costLabelColor;
-		//unitCostLabelStyle.fontStyle = FontStyle.Bold;
+		costLabelStyle = new GUIStyle();
+		costLabelStyle.fontSize = smallFontSize;
+		costLabelStyle.alignment = TextAnchor.UpperLeft;
+		costLabelStyle.normal.textColor = costLabelColor;
+
+		nameLabelStyle = new GUIStyle();
+		nameLabelStyle.fontSize = smallFontSize;
+		nameLabelStyle.alignment = TextAnchor.UpperLeft;
+		nameLabelStyle.normal.textColor = primaryTextColor;
 	}
 
 	private Rect moneyLabelRect;
 	private Rect roundLabelRect;
+	private Rect toggleUpgradeButtonRect;
+
+	private float showUpgradeButtonSize = 60.0f;
 
 	private void InitGUIRects () {
 		moneyLabelRect = new Rect(Screen.width - padding - labelWidth,
@@ -194,8 +239,95 @@ public class InGameMenu : MonoBehaviour {
 			padding,
 			labelWidth,
 			largeFontSize);
+
+		toggleUpgradeButtonRect = new Rect(padding, Screen.height-padding-showUpgradeButtonSize,
+			showUpgradeButtonSize,showUpgradeButtonSize);
 	}
 
+	// Upgrade Tree
+
+	private float upgradeTreeLineWidth = 2.0f;
+
+	private void DrawUpgradeTree () {
+		List <Upgrade> upgrades = gameLogic.AllUpgrades();
+
+
+		for (int i = 0; i < upgrades.Count; i++){
+			Upgrade u = upgrades[i];
+			Rect r = RectForUpgradeIDXandIDY(u.idX, u.idY);
+			DrawAUpgradeButton(r,u);
+
+
+			Vector2 rectCenter;
+			Vector2 lastRectCenter;
+			Rect lineR;
+
+			GUI.color = disabledColor;
+
+			if (u.idY > 0){
+				// Draw a line to idY - 1
+				rectCenter = r.center;
+				lastRectCenter = RectForUpgradeIDXandIDY(u.idX, u.idY-1).center;
+				lineR = new Rect(lastRectCenter.x - upgradeTreeLineWidth/2,
+					lastRectCenter.y,
+					upgradeTreeLineWidth,
+					rectCenter.y-lastRectCenter.y);
+				GUI.Box(lineR, "");
+			}else if (u.idX > 0){
+				// Draw a line to idX - 1, no need if idY > 0 because its parent will draw it
+				rectCenter = r.center;
+				lastRectCenter = RectForUpgradeIDXandIDY(u.idX-1, u.idY).center;
+				lineR = new Rect(lastRectCenter.x,
+					lastRectCenter.y - upgradeTreeLineWidth/2,
+					rectCenter.x - lastRectCenter.x,
+					upgradeTreeLineWidth);
+				GUI.Box(lineR, "");
+
+			}
+
+			RestoreGUIColor();
+
+			Rect nameRect = new Rect(r.x,
+				r.y - smallFontSize - padding,
+				labelWidth,
+				smallFontSize);
+			DrawAUpgradeName(nameRect,u);
+
+			Rect costRect = new Rect(r.x + r.width + padding,
+				r.y + textPaddingFromIcon,
+				labelWidth,
+				smallFontSize);
+
+			DrawAUpgradeCost(costRect,u);
+
+
+
+
+		}
+
+	}
+
+
+	private Rect RectForUpgradeIDXandIDY (int idX, int idY) {
+		float unitButtonSectionSize = (padding + unitIconSize) * 3 + padding;
+		float nameRectWidth = 80;
+		return new Rect (padding + idX * (upgradeIconSize + padding + nameRectWidth) + unitIconSize - upgradeIconSize,
+				unitButtonSectionSize + padding + padding + idY * (upgradeIconSize + padding*3),
+				upgradeIconSize,
+				upgradeIconSize
+			);
+	}
+
+
+	// Global UI
+
+	private void DrawGlobalUI () {
+		GUI.Label(moneyLabelRect, "$" + gameLogic.score.ToString(), moneyLabelStyle);
+		GUI.Label(roundLabelRect, "Round " + (gameLogic.round + 1).ToString(), roundLabelStyle);
+		if (GUI.Button(toggleUpgradeButtonRect, "Toggle\nUpgrade\nTree")){
+			showUpgradeTree = !showUpgradeTree;
+		}
+	}
 
 
 	// Helper Functions
@@ -203,10 +335,12 @@ public class InGameMenu : MonoBehaviour {
 	private Color moneyLabelColor = ColorWithHex(0x528D35);
 	private Color roundLabelColor = ColorWithHex(0x3C3F39);
 	private Color costLabelColor = ColorWithHex(0x528D35);
+	private Color primaryTextColor = ColorWithHex(0x505353);	
 	private Color secondaryTextColor = ColorWithHex(0x9AA09D);
 
 
 	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
+	private Color enabledColor = new Color(0.0f,0.0f,0.0f, 0.8f);
 	
 	private void RestoreGUIColor () {
 		GUI.color = Color.white;

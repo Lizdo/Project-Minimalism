@@ -65,10 +65,10 @@ public class GameLogic : MonoBehaviour {
 
 	// Upgrades
 
-	private List<Upgrade> upgrades = new List<Upgrade>();
+	private List <Upgrade> upgrades = new List <Upgrade>();
 	private int availableUpgradeCount = 3;
 
-	public List<Upgrade> nextUpgrades = new List<Upgrade>(); // Used by UI
+	public List< Upgrade> nextUpgrades = new List <Upgrade>(); // Used by UI
 
 
 	public const string kUnlockTriangleUnit = "UnlockTriangleUnit";
@@ -99,6 +99,21 @@ public class GameLogic : MonoBehaviour {
 		UpgradeWithID(kUnlockTriangleAbility1).prequisite = UpgradeWithID(kUnlockTriangleUnit);
 		UpgradeWithID(kUnlockTriangleAbility2).prequisite = UpgradeWithID(kUnlockTriangleUnit);
 
+
+		// Parse upgrade tree
+		int currentTreeIndex = 0;
+		for (int i = 0; i < upgrades.Count; i++){
+			Upgrade u = upgrades[i];
+			if (u.prequisite == null){
+				u.idX = currentTreeIndex;
+				currentTreeIndex++;
+			}else{
+				u.idX = u.prequisite.idX;
+				u.prequisite.numberOfChildUpgrades++;
+				u.idY = u.prequisite.numberOfChildUpgrades;
+			}
+		}
+
 		UpdateNextUpgrades();
 	}
 
@@ -116,6 +131,8 @@ public class GameLogic : MonoBehaviour {
 		}
 	}
 
+
+
 	private Upgrade UpgradeWithID (string _id) {
 		foreach (Upgrade u in upgrades){
 			if (u.id == _id){
@@ -127,6 +144,10 @@ public class GameLogic : MonoBehaviour {
 
 	public bool IsUpgradeUnlocked (string _id) {
 		return UpgradeWithID(_id).unlocked;
+	}
+
+	public List <Upgrade> AllUpgrades () {
+		return upgrades;
 	}
 
 
@@ -145,6 +166,8 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	public bool IsUpgradeButtonAvailable (Upgrade _u) {
+		if (!nextUpgrades.Contains(_u))
+			return false;
 		return score >= _u.cost;
 	}
 

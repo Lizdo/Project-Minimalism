@@ -85,9 +85,9 @@ public class GameLogic : MonoBehaviour {
 
 
 	private void InitUpgrades () {
+		upgrades.Add(new Upgrade(kUnlockBoxAbility1, "Unlock Box Ability 1"));
 		upgrades.Add(new Upgrade(kUnlockTriangleUnit, "Unlock new unit type: Triangle"));
 
-		upgrades.Add(new Upgrade(kUnlockBoxAbility1, "Unlock Box Ability 1"));
 		upgrades.Add(new Upgrade(kUnlockSphereUnit, "Unlock new unit type: Sphere"));
 		upgrades.Add(new Upgrade(kUnlockBoxAbility2, "Unlock Box Ability 2"));
 		upgrades.Add(new Upgrade(kUnlockHealthLevel1, "Increase all units health level"));

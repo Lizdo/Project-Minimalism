@@ -269,17 +269,17 @@ public class InGameMenu : MonoBehaviour {
 				rectCenter = r.center;
 				lastRectCenter = RectForUpgradeIDXandIDY(u.idX, u.idY-1).center;
 				lineR = new Rect(lastRectCenter.x - upgradeTreeLineWidth/2,
-					lastRectCenter.y,
+					lastRectCenter.y + upgradeIconSize/2,
 					upgradeTreeLineWidth,
-					rectCenter.y-lastRectCenter.y);
+					rectCenter.y-lastRectCenter.y - upgradeIconSize);
 				GUI.Box(lineR, "");
 			}else if (u.idX > 0){
 				// Draw a line to idX - 1, no need if idY > 0 because its parent will draw it
 				rectCenter = r.center;
 				lastRectCenter = RectForUpgradeIDXandIDY(u.idX-1, u.idY).center;
-				lineR = new Rect(lastRectCenter.x,
+				lineR = new Rect(lastRectCenter.x + upgradeIconSize/2,
 					lastRectCenter.y - upgradeTreeLineWidth/2,
-					rectCenter.x - lastRectCenter.x,
+					rectCenter.x - lastRectCenter.x - upgradeIconSize,
 					upgradeTreeLineWidth);
 				GUI.Box(lineR, "");
 

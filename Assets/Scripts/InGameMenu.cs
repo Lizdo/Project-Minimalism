@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 
 public class InGameMenu : MonoBehaviour {
@@ -62,7 +63,8 @@ public class InGameMenu : MonoBehaviour {
 				padding + i * (unitIconSize + padding),
 				unitIconSize,
 				unitIconSize);
-			UnitType type = (UnitType)i;
+			string unitTypeInString = buttons[i].Substring(4); //UnitTriangle -> Triangle
+			UnitType type = (UnitType)Enum.Parse(typeof(UnitType), unitTypeInString);
 			DrawAUnitButton(r, buttons[i], type);
 
 			Rect nameRect = new Rect(r.x + r.width + padding,
@@ -293,7 +295,7 @@ public class InGameMenu : MonoBehaviour {
 				smallFontSize);
 			DrawAUpgradeName(nameRect,u);
 
-			Rect costRect = new Rect(r.x + r.width + padding,
+			Rect costRect = new Rect(r.x + r.width,
 				r.y + textPaddingFromIcon,
 				labelWidth,
 				smallFontSize);

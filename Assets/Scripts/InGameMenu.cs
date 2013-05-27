@@ -8,7 +8,7 @@ public class InGameMenu : MonoBehaviour {
 
 
 	private GameLogic gameLogic;
-	private GUISkin skin;
+	public GUISkin skin;
 
 	private float padding = 10.0f;
 	private float textPaddingFromIcon = 5.0f;
@@ -19,8 +19,8 @@ public class InGameMenu : MonoBehaviour {
 
 	private float labelWidth = 100.0f;
 
-	private int smallFontSize = 12;
-	private int largeFontSize = 24;
+	public int smallFontSize = 12;
+	public int largeFontSize = 24;
 
 	private bool showUpgradeTree;
 
@@ -229,7 +229,8 @@ public class InGameMenu : MonoBehaviour {
 	private Rect roundLabelRect;
 	private Rect toggleUpgradeButtonRect;
 
-	private float showUpgradeButtonSize = 60.0f;
+	private float showUpgradeButtonWidth = 60.0f;
+	private float showUpgradeButtonHeight = 40.0f;
 
 	private void InitGUIRects () {
 		moneyLabelRect = new Rect(Screen.width - padding - labelWidth,
@@ -242,8 +243,8 @@ public class InGameMenu : MonoBehaviour {
 			labelWidth,
 			largeFontSize);
 
-		toggleUpgradeButtonRect = new Rect(padding, Screen.height-padding-showUpgradeButtonSize,
-			showUpgradeButtonSize,showUpgradeButtonSize);
+		toggleUpgradeButtonRect = new Rect(padding, Screen.height-padding-showUpgradeButtonHeight,
+			showUpgradeButtonWidth,showUpgradeButtonHeight);
 	}
 
 	// Upgrade Tree
@@ -326,7 +327,15 @@ public class InGameMenu : MonoBehaviour {
 	private void DrawGlobalUI () {
 		GUI.Label(moneyLabelRect, "$" + gameLogic.score.ToString(), moneyLabelStyle);
 		GUI.Label(roundLabelRect, "Round " + (gameLogic.round + 1).ToString(), roundLabelStyle);
-		if (GUI.Button(toggleUpgradeButtonRect, "Toggle\nUpgrade\nTree")){
+
+		string toggleUpgradeButtonString = "Upgrade\nButtons";
+
+		if (!showUpgradeTree){
+			toggleUpgradeButtonString = "Upgrade\nTree";
+		}
+
+
+		if (GUI.Button(toggleUpgradeButtonRect, toggleUpgradeButtonString)){
 			showUpgradeTree = !showUpgradeTree;
 		}
 	}
@@ -334,15 +343,15 @@ public class InGameMenu : MonoBehaviour {
 
 	// Helper Functions
 
-	private Color moneyLabelColor = ColorWithHex(0x528D35);
-	private Color roundLabelColor = ColorWithHex(0x3C3F39);
-	private Color costLabelColor = ColorWithHex(0x528D35);
-	private Color primaryTextColor = ColorWithHex(0x505353);	
-	private Color secondaryTextColor = ColorWithHex(0x9AA09D);
+	public Color moneyLabelColor = ColorWithHex(0x528D35);
+	public Color roundLabelColor = ColorWithHex(0x3C3F39);
+	public Color costLabelColor = ColorWithHex(0x528D35);
+	public Color primaryTextColor = ColorWithHex(0x505353);	
+	public Color secondaryTextColor = ColorWithHex(0x9AA09D);
 
 
-	private Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
-	private Color enabledColor = new Color(0.0f,0.0f,0.0f, 0.8f);
+	public Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
+	public Color enabledColor = new Color(0.0f,0.0f,0.0f, 0.8f);
 	
 	private void RestoreGUIColor () {
 		GUI.color = Color.white;

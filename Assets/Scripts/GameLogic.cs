@@ -204,7 +204,10 @@ public class GameLogic : MonoBehaviour {
 
 	// Routines
 
+	private Tutorial tutorial;
+
 	private void Awake () {
+		tutorial = GetComponent<Tutorial>();
 		LoadUnitPrefabs();
 		InitEntityPool();
 		InitializeFirstEncounter();
@@ -273,6 +276,9 @@ public class GameLogic : MonoBehaviour {
 
 		e.SetRoundAndPosition(round, NextEncounterPosition());
 		Debug.Log("New Encounter!");
+
+		tutorial.Show();
+
 		return e;
 	}
 

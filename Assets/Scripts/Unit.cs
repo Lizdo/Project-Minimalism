@@ -491,6 +491,11 @@ public class Unit : MonoBehaviour {
 	private float healthRegenRatioPerSec = 0.1f; // 10% per sec
 
 	private void RegenerateHealth () {
+		// No regen for Enemies
+		if (isEnemy){
+			return;
+		}
+
 		float HPtoRegen = healthRegenRatioPerSec * maxHealth * Time.deltaTime;
 		Heal(HPtoRegen, this);
 	}

@@ -5,8 +5,8 @@ public class Tutorial : MonoBehaviour {
 
 	private string text = "Testing this very long tutorial";
 
-	private float timeToDisplay = 5.0f;
-	private float fadeTime = 0.3f;
+	private float timeToDisplay = 4.0f;
+	private float fadeTime = 1.0f;
 	private float alpha = 0.0f;
 
 	private float width = 100.0f;

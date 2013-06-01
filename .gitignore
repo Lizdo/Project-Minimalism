@@ -5,6 +5,11 @@ Library/
 obj/
 *.svd
 
+*.blend1
+*.blend2
+*.blend1.meta
+*.blend2.meta
+
 !Library/*.asset
 !Library/AssetImportState
 !Library/AssetVersioning.db

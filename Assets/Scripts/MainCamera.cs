@@ -21,8 +21,8 @@ public class MainCamera : MonoBehaviour {
 	}
 
 	void Update () {
-		UpdatePosition();
 		UpdateHeight();
+		UpdatePosition();
 		UpdateFloorPosition();
 	}
 
@@ -47,7 +47,7 @@ public class MainCamera : MonoBehaviour {
 	}
 
 	private float heightUpdateRatio = 1.0f;
-	private float heightRatio = 2.0f;
+	private float heightRatio = 2.0f;	// Show x times the battalions on screen
 
 	private void UpdateHeight () {
 		Bounds battalionBounds = battalion.bounds;

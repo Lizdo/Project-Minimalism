@@ -20,20 +20,27 @@ public class InGameMenu : MonoBehaviour {
 	private float labelWidth = 100.0f;
 
 	public int smallFontSize = 12;
+	public int mediumFontSize = 18;
 	public int largeFontSize = 24;
+
+	private Texture2D lightBackground;
+	private Texture2D darkBackground;
 
 	private bool showUpgradeTree;
 
 	private void Awake () {
 		gameLogic = GetComponent<GameLogic>();
-		InitGUIStyles();
-		InitGUIRects();
 	}
 
 	// Use this for initialization
 	void Start () {
 		LoadIcons();
 		skin = Resources.Load("GUISkin", typeof(GUISkin)) as GUISkin;
+		lightBackground = Resources.Load("LightBackground", typeof(Texture2D)) as Texture2D;
+		darkBackground = Resources.Load("DarkBackground", typeof(Texture2D)) as Texture2D;
+
+		InitGUIStyles();
+		InitGUIRects();
 	}
 	
 	// Update is called once per frame
@@ -196,6 +203,7 @@ public class InGameMenu : MonoBehaviour {
 	private GUIStyle costLabelStyle;
 	private GUIStyle descriptionLabelStyle;
 	private GUIStyle nameLabelStyle;
+	private GUIStyle toggleUpgradeButtonStyle;
 
 	private void InitGUIStyles () {
 		moneyLabelStyle = new GUIStyle();
@@ -223,6 +231,13 @@ public class InGameMenu : MonoBehaviour {
 		nameLabelStyle.fontSize = smallFontSize;
 		nameLabelStyle.alignment = TextAnchor.UpperLeft;
 		nameLabelStyle.normal.textColor = primaryTextColor;
+
+		toggleUpgradeButtonStyle = new GUIStyle();
+		toggleUpgradeButtonStyle.alignment = TextAnchor.MiddleCenter;
+		toggleUpgradeButtonStyle.normal.background = lightBackground;
+		toggleUpgradeButtonStyle.normal.textColor = secondaryTextColor;
+		toggleUpgradeButtonStyle.active.background = darkBackground;
+
 	}
 
 	private Rect moneyLabelRect;
@@ -335,7 +350,7 @@ public class InGameMenu : MonoBehaviour {
 		}
 
 
-		if (GUI.Button(toggleUpgradeButtonRect, toggleUpgradeButtonString)){
+		if (GUI.Button(toggleUpgradeButtonRect, toggleUpgradeButtonString, toggleUpgradeButtonStyle)){
 			showUpgradeTree = !showUpgradeTree;
 		}
 	}

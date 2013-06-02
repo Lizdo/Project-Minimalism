@@ -219,6 +219,17 @@ public class Unit : MonoBehaviour {
 
 		while (nextState == UnitState.Invalid){
 
+			if (!enemy || enemy.isDead){
+				enemy = null;
+				nextState = UnitState.Idle;
+				continue;
+			}
+
+			if (isDead){
+				nextState = UnitState.Dead;
+				continue;
+			}
+
 			while (!NearTarget()){
 				MoveToTarget();
 				timeTryingToMoveToTarget += Time.deltaTime;
@@ -236,15 +247,6 @@ public class Unit : MonoBehaviour {
 				// TODO: Play Attack Anim
 				yield return new WaitForSeconds(attackSpeed);
 				AttackEnemy();
-			}
-
-			if (!enemy || enemy.isDead){
-				enemy = null;
-				nextState = UnitState.Idle;
-			}
-
-			if (isDead){
-				nextState = UnitState.Dead;
 			}
 
 			yield return null;

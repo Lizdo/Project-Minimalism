@@ -9,8 +9,8 @@ public class Tutorial : MonoBehaviour {
 	private float fadeTime = 1.0f;
 	private float alpha = 0.0f;
 
-	private float width = 100.0f;
-	private float height = 100.0f;
+	private float width = 200.0f;
+	private float height = 150.0f;
 
 	private GUIStyle style;
 	private InGameMenu menu;
@@ -25,8 +25,8 @@ public class Tutorial : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		style = new GUIStyle();
-		style.fontSize = menu.smallFontSize;
-		style.alignment = TextAnchor.UpperLeft;
+		style.fontSize = menu.mediumFontSize;
+		style.alignment = TextAnchor.MiddleCenter;
 		color = menu.primaryTextColor;
 	}
 	
@@ -66,8 +66,10 @@ public class Tutorial : MonoBehaviour {
 	}
 
 	private void InitNewTutorial () {
+		// TODO: change to a angle based randomization 
+		// 		and use the direction to the next encounter
 		float randomX = Random.value * (Screen.width - width * 2) + width;
-		float randomY = Random.value * (Screen.height - height * 2) + height;		
+		float randomY = Random.value * (Screen.height - height * 2) + height;
 		rect = new Rect(randomX, randomY, width, height);
 	}
 

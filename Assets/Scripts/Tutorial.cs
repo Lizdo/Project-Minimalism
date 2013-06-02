@@ -66,11 +66,16 @@ public class Tutorial : MonoBehaviour {
 
 	}
 
+	private float distanceFromCenterX = 200;
+	private float distanceFromCenterY = 120;
+
 	private void InitNewTutorial () {
 		// TODO: change to a angle based randomization 
 		// 		and use the direction to the next encounter
-		float randomX = Random.value * (Screen.width - width * 2) + width;
-		float randomY = Random.value * (Screen.height - height * 2) + height;
+		float randomAngle = Random.Range(0, 360.0f) * Mathf.Deg2Rad;
+		float randomX = Screen.width/2 + distanceFromCenterX * Mathf.Cos(randomAngle) - width/2;
+		float randomY = Screen.height/2 + distanceFromCenterY * Mathf.Sin(randomAngle) - height/2;
+
 		rect = new Rect(randomX, randomY, width, height);
 	}
 

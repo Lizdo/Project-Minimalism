@@ -99,17 +99,17 @@ public class GameLogic : MonoBehaviour {
 
 
 	private void InitUpgrades () {
-		upgrades.Add(new Upgrade(kUnlockBoxAbility1, "Unlock Box Ability 1"));
-		upgrades.Add(new Upgrade(kUnlockTriangleUnit, "Unlock new unit type: Triangle"));
+		upgrades.Add(new Upgrade(kUnlockBoxAbility1, "Unlock Box Ability 1", 5));
+		upgrades.Add(new Upgrade(kUnlockTriangleUnit, "Unlock new unit type: Triangle", 5));
 
 
-		upgrades.Add(new Upgrade(kUnlockBoxAbility2, "Unlock Box Ability 2"));
-		upgrades.Add(new Upgrade(kUnlockHealthLevel1, "Increase all units health level"));
+		upgrades.Add(new Upgrade(kUnlockBoxAbility2, "Unlock Box Ability 2", 5));
+		upgrades.Add(new Upgrade(kUnlockHealthLevel1, "Increase all units health level", 5));
 
-		upgrades.Add(new Upgrade(kUnlockSphereUnit, "Unlock new unit type: Sphere"));	
+		upgrades.Add(new Upgrade(kUnlockSphereUnit, "Unlock new unit type: Sphere", 5));	
 
-		upgrades.Add(new Upgrade(kUnlockTriangleAbility1, "Unlock Triangle Ability 1"));
-		upgrades.Add(new Upgrade(kUnlockTriangleAbility2, "Unlock Triangle Ability 2"));
+		upgrades.Add(new Upgrade(kUnlockTriangleAbility1, "Unlock Triangle Ability 1", 5));
+		upgrades.Add(new Upgrade(kUnlockTriangleAbility2, "Unlock Triangle Ability 2", 5));
 
 		// Setup relationship
 		UpgradeWithID(kUnlockTriangleAbility1).prequisite = UpgradeWithID(kUnlockTriangleUnit);
@@ -120,6 +120,7 @@ public class GameLogic : MonoBehaviour {
 		int currentTreeIndex = 0;
 		for (int i = 0; i < upgrades.Count; i++){
 			Upgrade u = upgrades[i];
+			u.gameLogic = this;
 			if (u.prequisite == null){
 				u.idX = currentTreeIndex;
 				currentTreeIndex++;
@@ -291,6 +292,7 @@ public class GameLogic : MonoBehaviour {
 			previousEncounter = currentEncounter;
 			currentEncounter = nextEncounter;
 			SpawnEntitiesAroundNextEncounter();
+			UpdateNextUpgrades();
 		}
 	}
 

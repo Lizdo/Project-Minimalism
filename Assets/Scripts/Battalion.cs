@@ -188,5 +188,14 @@ public class Battalion : MonoBehaviour {
 		return (destination - unit.transform.position) / 100;
 	}
 
+	public bool InCombat () {
+		foreach (Unit u in units){
+			if (u.InCombat()){
+				return true;
+			}
+		}
+		return false;
+	}
+
 
 }

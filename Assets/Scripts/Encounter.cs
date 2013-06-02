@@ -9,9 +9,11 @@ public enum EncounterType {
 
 public class Encounter : MonoBehaviour {
 
-	public int round;
-	public EncounterType type;
+	[HideInInspector] public int round;
+	[HideInInspector] public EncounterType type;
 	protected bool isResolved;
+	public string description;
+	public string tutorial;
 
 	protected GameLogic gameLogic;
 

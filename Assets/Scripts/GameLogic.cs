@@ -12,6 +12,7 @@ public class GameLogic : MonoBehaviour {
 	public Battalion enemyBattalion;
 
 	private Unit[] playerUnitPrefabs = new Unit[3];
+	private Unit[] enemyUnitPrefabs = new Unit[3];
 
 	public Unit enemyUnit;
 
@@ -29,6 +30,10 @@ public class GameLogic : MonoBehaviour {
 
 	public bool AllEnemiesDead () {
 		return enemyBattalion.AllUnitsDead();
+	}
+
+	public bool EnemyInCombat () {
+		return enemyBattalion.InCombat();
 	}
 
 
@@ -54,13 +59,22 @@ public class GameLogic : MonoBehaviour {
 		u.AddToBattalion(playerBattalion);
 	}
 
-	public void AddEnemyUnit () {
-		Unit u = Instantiate(enemyUnit) as Unit;
+
+	public void AddEnemyUnit (UnitType type) {
+		Unit u = Instantiate(enemyUnitPrefabs[(int)type]) as Unit;
 		u.AddToBattalion(enemyBattalion);
 	}
 
 	public void Reset () {
 		round = 0;
+	}
+
+	public string RoundDescription () {
+		string roundString = (round + 1).ToString();
+		string encounterString = (currentEncounter!=null) ? 
+		currentEncounter.description : "";
+
+		return roundString + ". " + encounterString;
 	}
 
 	// Upgrades
@@ -208,7 +222,10 @@ public class GameLogic : MonoBehaviour {
 
 	private void Awake () {
 		tutorial = GetComponent<Tutorial>();
+
 		LoadUnitPrefabs();
+		LoadEncounters();
+
 		InitEntityPool();
 		InitializeFirstEncounter();
 		InitUnitButtons();
@@ -219,6 +236,10 @@ public class GameLogic : MonoBehaviour {
 		playerUnitPrefabs[0] = (Resources.Load("PlayerUnitBox", typeof(GameObject)) as GameObject).GetComponent<Unit>();
 		playerUnitPrefabs[1] = (Resources.Load("PlayerUnitTriangle", typeof(GameObject)) as GameObject).GetComponent<Unit>();
 		playerUnitPrefabs[2] = (Resources.Load("PlayerUnitSphere", typeof(GameObject)) as GameObject).GetComponent<Unit>();
+
+		enemyUnitPrefabs[0] = (Resources.Load("EnemyUnitBox", typeof(GameObject)) as GameObject).GetComponent<Unit>();
+		enemyUnitPrefabs[1] = (Resources.Load("EnemyUnitTriangle", typeof(GameObject)) as GameObject).GetComponent<Unit>();
+		enemyUnitPrefabs[2] = (Resources.Load("EnemyUnitSphere", typeof(GameObject)) as GameObject).GetComponent<Unit>();		
 	}
 
 	private void InitializeFirstEncounter() {
@@ -250,6 +271,18 @@ public class GameLogic : MonoBehaviour {
 	// Encounter Management
 	///////////////////////////
 
+	private List<Encounter> encounters = new List<Encounter>();
+	private int waves = 100;
+
+	private void LoadEncounters () {
+		for (int i = 0; i < waves; i++){
+			Encounter e = Resources.Load("Encounter" + i.ToString(), typeof(Encounter)) as Encounter;
+			if (e != null){
+				encounters.Add(e);
+			}
+		}
+	}
+
 	private void UpdateCurrentEncounter () {
 		DebugHelper.Assert(currentEncounter != null);
 		if (currentEncounter.IsResolved()){
@@ -262,22 +295,12 @@ public class GameLogic : MonoBehaviour {
 	}
 
 	private Encounter NextEncounter () {
-		float rand = Random.value;
-		Encounter e;
-
-		if (rand >= 0.4){
-			e = (Instantiate(Resources.Load("EncounterCombat", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
-		}else if (rand >= 0.3){
-			e = (Instantiate(Resources.Load("EncounterUnit", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
-		}else{
-			e = (Instantiate(Resources.Load("EncounterResource", typeof(GameObject))) as GameObject).GetComponent<Encounter>();
-		}
-
+		Encounter e = Instantiate(encounters[round]) as Encounter;
 
 		e.SetRoundAndPosition(round, NextEncounterPosition());
 		Debug.Log("New Encounter!");
 
-		tutorial.Show();
+		tutorial.Show(e.tutorial);
 
 		return e;
 	}

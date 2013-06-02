@@ -4,10 +4,12 @@ using System.Collections.Generic;
 using System;
 
 
-public class InGameMenu : MonoBehaviour {
+public class InGameGUI : MonoBehaviour {
 
 
 	private GameLogic gameLogic;
+
+	[HideInInspector]
 	public GUISkin skin;
 
 	private float padding = 10.0f;
@@ -19,8 +21,13 @@ public class InGameMenu : MonoBehaviour {
 
 	private float labelWidth = 100.0f;
 
+	[HideInInspector]
 	public int smallFontSize = 12;
+
+	[HideInInspector]
 	public int mediumFontSize = 18;
+	
+	[HideInInspector]
 	public int largeFontSize = 24;
 
 	private Texture2D lightBackground;
@@ -318,10 +325,9 @@ public class InGameMenu : MonoBehaviour {
 
 			DrawAUpgradeCost(costRect,u);
 
-
-
-
 		}
+
+		// TODO: Draw a background Rect
 
 	}
 
@@ -341,7 +347,7 @@ public class InGameMenu : MonoBehaviour {
 
 	private void DrawGlobalUI () {
 		GUI.Label(moneyLabelRect, "$" + gameLogic.score.ToString(), moneyLabelStyle);
-		GUI.Label(roundLabelRect, "Round " + (gameLogic.round + 1).ToString(), roundLabelStyle);
+		GUI.Label(roundLabelRect, gameLogic.RoundDescription(), roundLabelStyle);
 
 		string toggleUpgradeButtonString = "Upgrade\nButtons";
 
@@ -358,14 +364,21 @@ public class InGameMenu : MonoBehaviour {
 
 	// Helper Functions
 
+	[HideInInspector]
 	public Color moneyLabelColor = ColorWithHex(0x528D35);
+	[HideInInspector]
 	public Color roundLabelColor = ColorWithHex(0x3C3F39);
+	[HideInInspector]
 	public Color costLabelColor = ColorWithHex(0x528D35);
+	[HideInInspector]
 	public Color primaryTextColor = ColorWithHex(0x505353);	
+	[HideInInspector]
 	public Color secondaryTextColor = ColorWithHex(0x9AA09D);
 
 
+	[HideInInspector]
 	public Color disabledColor = new Color(0.0f,0.0f,0.0f, 0.2f);
+	[HideInInspector]
 	public Color enabledColor = new Color(0.0f,0.0f,0.0f, 0.8f);
 	
 	private void RestoreGUIColor () {

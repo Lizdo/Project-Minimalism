@@ -9,24 +9,25 @@ public class Tutorial : MonoBehaviour {
 	private float fadeTime = 1.0f;
 	private float alpha = 0.0f;
 
-	private float width = 200.0f;
+	private float width = 250.0f;
 	private float height = 150.0f;
 
 	private GUIStyle style;
-	private InGameMenu menu;
+	private InGameGUI menu;
 	private Rect rect;
 
 	private Color color;
 
 	void Awake () {
-		menu = GetComponent<InGameMenu>();
+		menu = GetComponent<InGameGUI>();
 	}
 
 	// Use this for initialization
 	void Start () {
 		style = new GUIStyle();
 		style.fontSize = menu.mediumFontSize;
-		style.alignment = TextAnchor.MiddleCenter;
+		style.alignment = TextAnchor.UpperLeft;
+		style.wordWrap = true;
 		color = menu.primaryTextColor;
 	}
 	

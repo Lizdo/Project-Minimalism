@@ -22,6 +22,7 @@ public class Unit : MonoBehaviour {
 	}
 
 	public bool isEnemy;
+	[HideInInspector]
 	public bool isAssigned;	// If the units belongs to a battalion
 
 	public UnitState state = UnitState.Idle;
@@ -34,11 +35,16 @@ public class Unit : MonoBehaviour {
 	public int cost = 50;
 	public UnitType type;
 
+	[HideInInspector]
 	public float attackDistance = 30.0f;
+	[HideInInspector]
 	public float attackSpeed = 0.1f;	// Time Per Attack
+	[HideInInspector]
 	public float attackDamage = 60;
 
-	public float joinDistance = 10.0f;
+	[HideInInspector]
+	public float joinDistance = 20.0f;
+	[HideInInspector]
 	public float maxHealth = 100;
 	public float health;
 
@@ -46,7 +52,9 @@ public class Unit : MonoBehaviour {
 
 
 	// TODO: plug logic to calculate attack damage from upgrade level
+	[HideInInspector]
 	public int healthUpgradeLevel = 1;
+	[HideInInspector]
 	public int attackDamageUpgradeLevel = 1;
 
 	public Unit enemy;
@@ -58,7 +66,7 @@ public class Unit : MonoBehaviour {
 	private Vector3 offsetFromSpawnLocation;
 
 	private const float MAX_OFFSET_FROM_SPAWNLOCATION = 10.0f;
-	private const float MOVEMENT_TOLERANCE = 5.0f;
+	private const float MOVEMENT_TOLERANCE = 3.0f;
 
 	private Quaternion defaultRotation = Quaternion.Euler(270,0,0);
 
@@ -115,6 +123,10 @@ public class Unit : MonoBehaviour {
 			health = maxHealth;
 		}
 		UpdateHealthVisual();	
+	}
+
+	public bool InCombat () {
+		return state == UnitState.Attacking;
 	}
 
 
